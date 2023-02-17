@@ -5,11 +5,12 @@ const half_block_size = block_size / 2
 
 // Block represents a block in the game.
 struct Block {
+	id int
+	name string
 mut:
 	vertices []Vertex = []Vertex{cap: 8}
 	edges [][]int = [][]int{cap: 4}
 	relative_size u8 = 1
-	texture &Texture = unsafe { nil }
 pub mut:
 	loc Location
 	rot Rotation = Rotation{0.004, 0.002, 0.008}
@@ -17,12 +18,11 @@ pub mut:
 
 // new_block instantiates a `Block` with the given
 // texture and location.
-fn new_block(texture &Texture, loc Location) &Block {
-	mut block := &Block{loc: loc}
-	block.loc.x = half_width
-	block.loc.y = half_height
-	unsafe {
-		block.texture = texture
+fn new_block(id int, name string, loc Location) &Block {
+	mut block := &Block{
+		id: id
+		name: name
+		loc: loc
 	}
 	block.vertices = [
 		Vertex{

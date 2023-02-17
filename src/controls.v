@@ -4,7 +4,6 @@ import sokol.sapp
 // handle_mouse_move handles all mouse movements in game.
 fn handle_mouse_move(x f32, y f32, mut game Game) {
 	if game.state == .playing {
-		sapp.show_mouse(false)
 		sapp.lock_mouse(true)
 		yaw := f32(game.delta_time) * game.mouse_sensitivity * game.g.mouse_dx / 10000
 		game.player.rot.yaw += yaw
@@ -18,7 +17,6 @@ fn handle_mouse_move(x f32, y f32, mut game Game) {
 			game.player.rot.pitch = f32(-rads90)
 		}
 	} else {
-		sapp.show_mouse(true)
 		sapp.lock_mouse(false)
 	}
 }

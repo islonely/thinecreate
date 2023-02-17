@@ -1,18 +1,22 @@
 import gx
 import math
+import stbi
 
 // BufferedImage is exactly what it says it is.
 [heap]
 struct BufferedImage {
 mut:
-	buffer &u32 = unsafe { nil }
-	width u32
-	height u32
+	buffer &int = unsafe { nil }
+	width int
+	height int
 }
 
 // new_bufferedimage instantiates a `BufferedImage` from a provided
 // width and height and allocates memory for the image data.
-fn new_bufferedimage(width u32, height u32) &BufferedImage {
+fn new_bufferedimage(width int, height int) &BufferedImage {
+	if width < 0 || height < 0 {
+		return 0
+	}
 	mut img := &BufferedImage{
 		width: width
 		height: height
@@ -21,6 +25,20 @@ fn new_bufferedimage(width u32, height u32) &BufferedImage {
 		img.buffer = malloc(img.width * img.height * 4)
 	}
 	return img
+}
+
+fn new_bufferedimage_from_memory(b &u8, size int) !&BufferedImage {
+	stb_img := stbi.load_from_memory(b, size)!
+	mut img := &BufferedImage{
+		width: stb_img.width
+		height: stb_img.height
+		buffer: stb_img.data
+	}
+	return img
+}
+
+fn new_bufferedimage_from_bytes(b []u8) !&BufferedImage {
+	return new_bufferedimage_from_memory(b.data, b.len)!
 }
 
 // zero sets the image data to 0s by reallocating the memory.
@@ -37,7 +55,7 @@ fn (mut img BufferedImage) draw_pixel(x int, y int, color gx.Color) {
 		return
 	}
 	unsafe {
-		img.buffer[u32(x) + u32(y) * img.width] = u32(color.abgr8())
+		img.buffer[x + y * img.width] = color.abgr8()
 	}
 }
 

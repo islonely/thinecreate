@@ -35,7 +35,7 @@ mut:
 	mouse_sensitivity f32 = 1.0
 	player Player
 
-	textures []&Texture
+	textures []&BufferedImage
 
 	block Block
 
@@ -56,7 +56,7 @@ enum GameState {
 fn new_game() &Game {
 	mut game := &Game{}
 	// 4 for channels rgba
-	game.img = new_bufferedimage(u32(game.width), u32(game.height))
+	game.img = new_bufferedimage(game.width, game.height)
 	game.g = gg.new_context(
 		user_data: game
 		init_fn: init
@@ -73,6 +73,12 @@ fn new_game() &Game {
 		game.g.fps.show = true
 	}
 	return game
+}
+
+fn (mut game Game) init_textures() ! {
+	game.textures << new_bufferedimage_from_bytes($embed_file('./img/block_grass_bottom.png').to_bytes())!
+	game.textures << new_bufferedimage_from_bytes($embed_file('./img/block_grass_side.png').to_bytes())!
+	game.textures << new_bufferedimage_from_bytes($embed_file('./img/block_grass_top.png').to_bytes())!
 }
 
 // update updates the game according to what GameState it's currently in.
@@ -152,8 +158,9 @@ fn (mut game Game) draw_ui() {
 }
 
 // draw_floor draw the floor and ceiling to the pixel buffer.
+[direct_array_access]
 fn (mut game Game) draw_floor() {
-	grass := game.textures[2].pixels
+	grass := game.textures[2].buffer
 	cosine := math.cos(game.player.rot.yaw)
 	sine := math.sin(game.player.rot.yaw)
 	for y in 0..game.height {
@@ -175,7 +182,7 @@ fn (mut game Game) draw_floor() {
 			mut yy := int(z * cosine - depth * sine + int(game.player.loc.y))
 
 			unsafe {
-				game.img.buffer[x + y * game.width] = u32(grass[(xx & 7) + (yy & 7) * 16])
+				game.img.buffer[x + y * game.width] = grass[(xx & 7) + (yy & 7) * 16]
 			}
 		}
 	}
