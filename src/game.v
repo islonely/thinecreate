@@ -1,16 +1,28 @@
 import gg
+import gx
 import math
 import time
 
+const(
+	width = 1200
+	half_width = width/2
+	height = 860
+	half_height = height/2
+)
+
 // Game is a game.
+[heap]
 struct Game {
 mut:
 	g &gg.Context = unsafe { nil }
-	buffer &int	= unsafe { nil }	// int for 4 channels: rgba
+	// buffer &int	= unsafe { nil }	// int for 4 channels: rgba
+	img &BufferedImage = unsafe { nil }
 	buffered_image &gg.Image = unsafe { nil }
 
-	width int
-	height int
+	width int = width
+	half_width int = half_width
+	height int = height
+	half_height int = half_height
 
 	delta_time i64
 	last_time i64 = time.now().unix_time_milli()
@@ -22,6 +34,12 @@ mut:
 
 	mouse_sensitivity f32 = 1.0
 	player Player
+
+	textures []&Texture
+
+	block Block
+
+	fov u8 = u8(math.round(1.0 / math.tan(80.0 / 2.0)))
 }
 
 // GameState is all the available states the game can be in.
@@ -36,14 +54,9 @@ enum GameState {
 
 // new_game instantiates a Game and returns a reference to it.
 fn new_game() &Game {
-	mut game := &Game{
-		width: 1200
-		height: 860
-	}
+	mut game := &Game{}
 	// 4 for channels rgba
-	game.buffer = unsafe {
-		malloc(game.width * game.height * 4)
-	}
+	game.img = new_bufferedimage(u32(game.width), u32(game.height))
 	game.g = gg.new_context(
 		user_data: game
 		init_fn: init
@@ -98,34 +111,61 @@ fn (mut game Game) update_playing(delta i64) {
 	}
 }
 
-// clear_buffer zeros out the pixel buffer.
-[direct_array_access; inline]
-fn (mut game Game) clear_buffer() {
-	for i := 0; i < game.width * game.height; i++ {
-		unsafe {
-			game.buffer[i] = 0
-		}
-	}
-}
+// clear_buffer sets the pixel buffer to the default value.
+// [direct_array_access; inline]
+// fn (mut game Game) clear_buffer() {
+// 	for i := 0; i < game.width * game.height; i++ {
+// 		unsafe {
+// 			// my numbers are backwards (abgr instead of rgba)
+// 			// I think it has something to do with endian, but
+// 			// I don't code that low level usually so idk *shrug*
+// 			game.buffer[i] = 0xffff9020
+// 		}
+// 	}
+// }
 
 // draw updates the buffered image and draws it to the screen.
 fn (mut game Game) draw() {
-	game.clear_buffer()
+	game.img.zero()
 	
 	game.draw_floor()
+	game.block.draw(mut game.img)
+	game.draw_ui()
 
-	game.buffered_image.update_pixel_data(game.buffer)
+	game.buffered_image.update_pixel_data(game.img.buffer)
 	game.g.draw_image(0, 0, game.width, game.height, game.buffered_image)
+	// anything drawn with gg.Context instead of drawing to the pixel buffer must
+	// being invoked after this here. I confused myself for a minute, so I'm just
+	// leaving a note.
+}
+
+// draw_ui draws the user interface to the screen
+fn (mut game Game) draw_ui() {
+	// draw reticle
+	reticle_size := 10
+	reticle_color := gx.hex(0x333333cc)
+	game.img.draw_line(game.half_width, game.half_height - reticle_size,
+					 game.half_width, game.half_height + reticle_size,
+					 reticle_color)
+	game.img.draw_line(game.half_width - reticle_size, game.half_height,
+					 game.half_width + reticle_size, game.half_height,
+					 reticle_color)
 }
 
 // draw_floor draw the floor and ceiling to the pixel buffer.
 [direct_array_access]
 fn (mut game Game) draw_floor() {
+	grass := game.textures[2].pixels
 	cosine := math.cos(game.player.rot.yaw)
 	sine := math.sin(game.player.rot.yaw)
 	for y in 0..game.height {
+		// temp solution to remove ceiling
+		if y < game.height/2 {
+			continue
+		}
+
 		ceiling := math.abs((y - f32(game.height) / 2.0) / f32(game.height))
-		z := 12.0 / ceiling
+		mut z := 16.0 / ceiling
 		for x in 0..game.width {
 			if z > 400 {
 				continue
@@ -133,11 +173,11 @@ fn (mut game Game) draw_floor() {
 
 			mut depth := (x - f32(game.width) / 2.0) / game.height
 			depth *= z
-			mut xx := int(depth * cosine + z * sine - int(game.player.loc.x)) & 15 << 8
-			mut yy := int(z * cosine - depth * sine + int(game.player.loc.y)) & 15 << 8
+			mut xx := int(depth * cosine + z * sine - int(game.player.loc.x))
+			mut yy := int(z * cosine - depth * sine + int(game.player.loc.y))
 
 			unsafe {
-				game.buffer[x + y * game.width] = (xx * 16) | (-yy * 16) << 8
+				game.img.buffer[x + y * game.width] = u32(grass[(xx & 7) + (yy & 7) * 16])
 			}
 		}
 	}

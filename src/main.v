@@ -15,6 +15,14 @@ fn C._sapp_glx_swapinterval(int)
 // init is called before the game starts running.
 fn init(mut game Game) {
 	C._sapp_glx_swapinterval(0)
+
+	init_textures(mut game) or {
+		println('Error: failed to load textures.')
+		println(err.msg())
+		exit(0)
+	}
+	game.block = new_block(game.textures[1], Location{})
+
 	game.buffered_image = game.g.get_cached_image_by_idx(game.g.new_streaming_image(game.width, game.height, 4, gg.StreamingImageConfig{}))
 }
 

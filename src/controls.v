@@ -11,6 +11,12 @@ fn handle_mouse_move(x f32, y f32, mut game Game) {
 
 		pitch := f32(game.delta_time) * game.mouse_sensitivity * game.g.mouse_dy / 10000
 		game.player.rot.pitch += pitch
+		if game.player.rot.pitch > f32(rads90) {
+			game.player.rot.pitch = f32(rads90)
+		}
+		if game.player.rot.pitch < f32(-rads90) {
+			game.player.rot.pitch = f32(-rads90)
+		}
 	} else {
 		sapp.show_mouse(true)
 		sapp.lock_mouse(false)
