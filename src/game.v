@@ -112,7 +112,6 @@ fn (mut game Game) update_playing(delta i64) {
 }
 
 // clear_buffer sets the pixel buffer to the default value.
-// [direct_array_access; inline]
 // fn (mut game Game) clear_buffer() {
 // 	for i := 0; i < game.width * game.height; i++ {
 // 		unsafe {
@@ -153,7 +152,6 @@ fn (mut game Game) draw_ui() {
 }
 
 // draw_floor draw the floor and ceiling to the pixel buffer.
-[direct_array_access]
 fn (mut game Game) draw_floor() {
 	grass := game.textures[2].pixels
 	cosine := math.cos(game.player.rot.yaw)

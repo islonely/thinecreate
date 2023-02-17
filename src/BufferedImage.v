@@ -25,7 +25,6 @@ fn new_bufferedimage(width u32, height u32) &BufferedImage {
 
 // zero sets the image data to 0s by reallocating the memory.
 // NOTE: I'm not sure if this is the optimal way to do this :| 
-[direct_array_access]
 fn (mut img BufferedImage) zero() {
 	unsafe {
 		img.buffer = malloc(img.width * img.height * 4)
@@ -33,7 +32,6 @@ fn (mut img BufferedImage) zero() {
 }
 
 // draw_pixel draws a pixel to the image data at (x, y).
-[direct_array_access]
 fn (mut img BufferedImage) draw_pixel(x int, y int, color gx.Color) {
 	if (x < 0 || y < 0) || (x > img.width || y > img.width) {
 		return
