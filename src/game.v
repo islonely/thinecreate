@@ -16,14 +16,17 @@ const(
 struct Game {
 mut:
 	g &gg.Context = unsafe { nil }
+	pipeline sgl.Pipeline
+	init_flag bool
 	// buffer &int	= unsafe { nil }	// int for 4 channels: rgba
 	img &BufferedImage = unsafe { nil }
-	buffered_image &gg.Image = unsafe { nil }
+	gg_image &gg.Image = unsafe { nil }
 
 	width int = width
 	half_width int = half_width
 	height int = height
 	half_height int = half_height
+	aspect_ratio f32 = f32(width) / f32(height)
 
 	delta_time i64
 	last_time i64 = time.now().unix_time_milli()
@@ -40,7 +43,7 @@ mut:
 
 	block Block
 
-	fov f32 = 85.0 / 100.0
+	fov f32 = 60
 }
 
 // GameState is all the available states the game can be in.
@@ -137,8 +140,8 @@ fn (mut game Game) draw() {
 	// game.draw_floor()
 	game.draw_ui()
 
-	game.buffered_image.update_pixel_data(game.img.buffer)
-	game.g.draw_image(0, 0, game.width, game.height, game.buffered_image)
+	game.gg_image.update_pixel_data(game.img.buffer)
+	game.g.draw_image(0, 0, game.width, game.height, game.gg_image)
 	// anything drawn with gg.Context instead of drawing to the pixel buffer must
 	// being invoked after this here. I confused myself for a minute, so I'm just
 	// leaving a note.

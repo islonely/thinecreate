@@ -5,17 +5,35 @@ import sokol.sapp
 fn handle_mouse_move(x f32, y f32, mut game Game) {
 	if game.state == .playing {
 		sapp.lock_mouse(true)
-		yaw := f32(game.delta_time) * game.mouse_sensitivity * game.g.mouse_dx / 10000
-		game.player.rot.yaw += yaw
 
-		pitch := f32(game.delta_time) * game.mouse_sensitivity * game.g.mouse_dy / 10000
+		yaw := (game.mouse_sensitivity * game.g.mouse_dx * 360) / game.width
+		game.player.rot.yaw += yaw
+		if game.player.rot.yaw >= 360 {
+			game.player.rot.yaw -= 360
+		} else if game.player.rot.yaw <= -360 {
+			game.player.rot.yaw += 360
+		}
+		
+		
+		pitch := (game.mouse_sensitivity * game.g.mouse_dy * 360) / game.width
 		game.player.rot.pitch += pitch
-		if game.player.rot.pitch > f32(rads90*2) {
-			game.player.rot.pitch = f32(rads90*2)
+		if game.player.rot.pitch >= 180 {
+			game.player.rot.pitch = 180
+		} else if game.player.rot.pitch <= -180 {
+			game.player.rot.pitch = -180
 		}
-		if game.player.rot.pitch < f32(-rads90*2) {
-			game.player.rot.pitch = f32(-rads90*2)
-		}
+
+		// yaw := f32(game.delta_time) * game.mouse_sensitivity * game.g.mouse_dx / 10000
+		// game.player.rot.yaw += yaw
+
+		// pitch := f32(game.delta_time) * game.mouse_sensitivity * game.g.mouse_dy / 10000
+		// game.player.rot.pitch += pitch
+		// if game.player.rot.pitch > f32(rads90*2) {
+		// 	game.player.rot.pitch = f32(rads90*2)
+		// }
+		// if game.player.rot.pitch < f32(-rads90*2) {
+		// 	game.player.rot.pitch = f32(-rads90*2)
+		// }
 	} else {
 		sapp.lock_mouse(false)
 	}

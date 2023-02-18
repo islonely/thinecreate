@@ -49,54 +49,63 @@ fn new_block(id int, name string, texture &BufferedImage, loc Location) &Block {
 
 fn (mut block Block) draw(mut game Game) {
 	sgl.defaults()
-	sgl.load_pipeline(game.g.pipeline.alpha)
+	sgl.load_pipeline(game.pipeline)
 
 	sgl.enable_texture()
 	sgl.texture(block.gfx_texture)
 
 	sgl.matrix_mode_projection()
-	sgl.perspective(game.fov, f32(width) / f32(height), 0.0, 100.0)
+	sgl.perspective(sgl.rad(game.fov), game.aspect_ratio, 0.1, 1000.0)
 
 	sgl.matrix_mode_modelview()
-	sgl.translate(block.loc.x + game.player.loc.x, block.loc.z + game.player.loc.z ,block.loc.y + game.player.loc.y)
-	// sgl.scale(-game.player.loc.x, game.player.loc.z, game.player.loc.y)
+	x := block.loc.x + game.player.loc.x
+	y := block.loc.z + game.player.loc.z
+	z := block.loc.y + game.player.loc.y
+	sgl.translate(x, y, z)
 
 	sgl.begin_quads()
 	sgl.c3f(1, 1, 1)
 	// edge coord
 	// x,y,z, texture cord: u,v
-	// sgl.rotate(-game.player.rot.yaw, 0.0, 1.0, 0.0)
-	// sgl.rotate(-game.player.rot.pitch, 1.0, 0.0, 0.0)
+	sgl.rotate(sgl.rad(game.player.rot.yaw), 0.0, 1.0, 0.0)
+	sgl.rotate(sgl.rad(game.player.rot.pitch), 1.0, 0.0, 0.0)
+	// back face
 	sgl.v3f_t2f(-1.0, 1.0, -1.0, 0.0, 0.66)
 	sgl.v3f_t2f(1.0, 1.0, -1.0, 0.25, 0.66)
 	sgl.v3f_t2f(1.0, -1.0, -1.0, 0.25, 0.33)
 	sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.0, 0.33)
-	sgl.push_matrix()
+	// front face
 	sgl.c3f(1, 1, 1)
 	sgl.v3f_t2f(-1.0, -1.0, 1.0, 0.25, 0.66)
 	sgl.v3f_t2f(1.0, -1.0, 1.0, 0.5, 0.66)
 	sgl.v3f_t2f(1.0, 1.0, 1.0, 0.5, 0.33)
 	sgl.v3f_t2f(-1.0, 1.0, 1.0, 0.25, 0.33)
+	// left face
 	sgl.c3f(1, 1, 1)
 	sgl.v3f_t2f(-1.0, -1.0, 1.0, 0.5, 0.66)
 	sgl.v3f_t2f(-1.0, 1.0, 1.0, 0.75, 0.66)
 	sgl.v3f_t2f(-1.0, 1.0, -1.0, 0.75, 0.33)
 	sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.5, 0.33)
+	// right face
 	sgl.c3f(1, 1, 1)
 	sgl.v3f_t2f(1.0, -1.0, 1.0, 0.75, 0.66)
 	sgl.v3f_t2f(1.0, -1.0, -1.0, 1.0, 0.66)
 	sgl.v3f_t2f(1.0, 1.0, -1.0, 1.0, 0.33)
 	sgl.v3f_t2f(1.0, 1.0, 1.0, 0.75, 0.33)
-	// sgl.c3f(r, g, b)
-	// sgl.v3f_t2f(1.0, -1.0, -1.0, 0.0, 0.25)
-	// sgl.v3f_t2f(1.0, -1.0, 1.0, 0.25, 0.25)
-	// sgl.v3f_t2f(-1.0, -1.0, 1.0, 0.25, 0.0)
-	// sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.0, 0.0)
-	// sgl.c3f(r, g, b)
-	// sgl.v3f_t2f(-1.0, 1.0, -1.0, 0.0, 0.25)
-	// sgl.v3f_t2f(-1.0, 1.0, 1.0, 0.25, 0.25)
-	// sgl.v3f_t2f(1.0, 1.0, 1.0, 0.25, 0.0)
-	// sgl.v3f_t2f(1.0, 1.0, -1.0, 0.0, 0.0)
+	// bottom face
+	sgl.c3f(1, 1, 1)
+	sgl.v3f_t2f(1.0, -1.0, -1.0, 0.25, 0.75)
+	sgl.v3f_t2f(1.0, -1.0, 1.0, 0.5, 0.75)
+	sgl.v3f_t2f(-1.0, -1.0, 1.0, 0.5, 1.0)
+	sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.25, 1.0)
+	// top face
+	sgl.c3f(1, 1, 1)
+	sgl.v3f_t2f(-1.0, 1.0, -1.0, 0.25, 0.25)
+	sgl.v3f_t2f(-1.0, 1.0, 1.0, 0.5, 0.25)
+	sgl.v3f_t2f(1.0, 1.0, 1.0, 0.5, 0.0)
+	sgl.v3f_t2f(1.0, 1.0, -1.0, 0.25, 0.0)
+
+	sgl.push_matrix()
 	sgl.end()
 
 	sgl.pop_matrix()
