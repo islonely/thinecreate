@@ -5,7 +5,7 @@ const rads90 = math.radians(90)
 struct Player {
 mut:
 	rot Rotation
-	loc Location
+	loc Location = Location{x: 0, y: -6, z: 0}
 	run_speed f32 = 1.3 / 100
 	sneak_speed f32 = 0.3 / 100
 	walk_forwards_speed f32 = 0.9 / 100

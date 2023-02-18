@@ -1,10 +1,7 @@
-import gx
-import math
 import sokol.sgl
-import sokol.sapp
 import sokol.gfx
 
-const block_size = 128
+const block_size = 16
 const half_block_size = block_size / 2
 
 // Block represents a block in the game.
@@ -64,42 +61,36 @@ fn (mut block Block) draw(mut game Game) {
 	sgl.translate(x, y, z)
 
 	sgl.begin_quads()
-	sgl.c3f(1, 1, 1)
 	// edge coord
 	// x,y,z, texture cord: u,v
 	sgl.rotate(sgl.rad(game.player.rot.yaw), 0.0, 1.0, 0.0)
 	sgl.rotate(sgl.rad(game.player.rot.pitch), 1.0, 0.0, 0.0)
 	// back face
-	sgl.v3f_t2f(-1.0, 1.0, -1.0, 0.0, 0.66)
-	sgl.v3f_t2f(1.0, 1.0, -1.0, 0.25, 0.66)
-	sgl.v3f_t2f(1.0, -1.0, -1.0, 0.25, 0.33)
-	sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.0, 0.33)
+	sgl.v3f_t2f(-1.0, 1.0, -1.0, 0.75, 0.33)
+	sgl.v3f_t2f(1.0, 1.0, -1.0, 1.0, 0.33)
+	sgl.v3f_t2f(1.0, -1.0, -1.0, 1.0, 0.66)
+	sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.75, 0.66)
 	// front face
-	sgl.c3f(1, 1, 1)
 	sgl.v3f_t2f(-1.0, -1.0, 1.0, 0.25, 0.66)
 	sgl.v3f_t2f(1.0, -1.0, 1.0, 0.5, 0.66)
 	sgl.v3f_t2f(1.0, 1.0, 1.0, 0.5, 0.33)
 	sgl.v3f_t2f(-1.0, 1.0, 1.0, 0.25, 0.33)
 	// left face
-	sgl.c3f(1, 1, 1)
-	sgl.v3f_t2f(-1.0, -1.0, 1.0, 0.5, 0.66)
-	sgl.v3f_t2f(-1.0, 1.0, 1.0, 0.75, 0.66)
-	sgl.v3f_t2f(-1.0, 1.0, -1.0, 0.75, 0.33)
-	sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.5, 0.33)
+	sgl.v3f_t2f(-1.0, 1.0, 1.0, 0.25, 0.33)
+	sgl.v3f_t2f(-1.0, 1.0, -1.0, 0.0, 0.33)
+	sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.0, 0.66)
+	sgl.v3f_t2f(-1.0, -1.0, 1.0, 0.25, 0.66)
 	// right face
-	sgl.c3f(1, 1, 1)
-	sgl.v3f_t2f(1.0, -1.0, 1.0, 0.75, 0.66)
-	sgl.v3f_t2f(1.0, -1.0, -1.0, 1.0, 0.66)
-	sgl.v3f_t2f(1.0, 1.0, -1.0, 1.0, 0.33)
-	sgl.v3f_t2f(1.0, 1.0, 1.0, 0.75, 0.33)
+	sgl.v3f_t2f(1.0, -1.0, 1.0, 0.5, 0.66)
+	sgl.v3f_t2f(1.0, -1.0, -1.0, 0.75, 0.66)
+	sgl.v3f_t2f(1.0, 1.0, -1.0, 0.75, 0.33)
+	sgl.v3f_t2f(1.0, 1.0, 1.0, 0.5, 0.33)
 	// bottom face
-	sgl.c3f(1, 1, 1)
-	sgl.v3f_t2f(1.0, -1.0, -1.0, 0.25, 0.75)
-	sgl.v3f_t2f(1.0, -1.0, 1.0, 0.5, 0.75)
-	sgl.v3f_t2f(-1.0, -1.0, 1.0, 0.5, 1.0)
-	sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.25, 1.0)
+	sgl.v3f_t2f(1.0, -1.0, -1.0, 0.25, 1.0)
+	sgl.v3f_t2f(1.0, -1.0, 1.0, 0.5, 1.0)
+	sgl.v3f_t2f(-1.0, -1.0, 1.0, 0.5, 0.75)
+	sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.25, 0.75)
 	// top face
-	sgl.c3f(1, 1, 1)
 	sgl.v3f_t2f(-1.0, 1.0, -1.0, 0.25, 0.25)
 	sgl.v3f_t2f(-1.0, 1.0, 1.0, 0.5, 0.25)
 	sgl.v3f_t2f(1.0, 1.0, 1.0, 0.5, 0.0)

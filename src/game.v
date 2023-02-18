@@ -18,7 +18,6 @@ mut:
 	g &gg.Context = unsafe { nil }
 	pipeline sgl.Pipeline
 	init_flag bool
-	// buffer &int	= unsafe { nil }	// int for 4 channels: rgba
 	img &BufferedImage = unsafe { nil }
 	gg_image &gg.Image = unsafe { nil }
 

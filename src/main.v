@@ -2,7 +2,6 @@ module main
 
 import gg
 import time
-import sokol.sapp
 import sokol.gfx
 import sokol.sgl
 
