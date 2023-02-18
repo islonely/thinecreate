@@ -6,11 +6,11 @@ struct Player {
 mut:
 	rot Rotation
 	loc Location
-	run_speed f32 = 1.3 / 10
-	sneak_speed f32 = 0.3 / 10
-	walk_forwards_speed f32 = 0.9 / 10
-	walk_backwards_speed f32 = 0.7 / 10
-	strafe_speed f32 = 0.7 / 10
+	run_speed f32 = 1.3 / 100
+	sneak_speed f32 = 0.3 / 100
+	walk_forwards_speed f32 = 0.9 / 100
+	walk_backwards_speed f32 = 0.7 / 100
+	strafe_speed f32 = 0.7 / 100
 }
 
 // move_forward moves the player in the direction they're facing.

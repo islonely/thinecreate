@@ -1,116 +1,104 @@
 import gx
+import math
+import sokol.sgl
+import sokol.sapp
+import sokol.gfx
 
 const block_size = 128
 const half_block_size = block_size / 2
 
 // Block represents a block in the game.
 struct Block {
+pub:
 	id int
 	name string
-mut:
-	vertices []Vertex = []Vertex{cap: 8}
-	edges [][]int = [][]int{cap: 4}
-	relative_size u8 = 1
+	texture &BufferedImage = unsafe { nil }
 pub mut:
+	gfx_texture gfx.Image
 	loc Location
-	rot Rotation = Rotation{0.004, 0.002, 0.008}
+	rot Rotation = Rotation{0.002, 0.001, 0.004}
 }
 
-// new_block instantiates a `Block` with the given
-// texture and location.
-fn new_block(id int, name string, loc Location) &Block {
+// new_block instantiates a `Block`.
+fn new_block(id int, name string, texture &BufferedImage, loc Location) &Block {
 	mut block := &Block{
 		id: id
 		name: name
+		texture: texture
 		loc: loc
 	}
-	block.vertices = [
-		Vertex{
-			x: (block.loc.x - half_block_size),
-			y: (block.loc.y - half_block_size),
-			z: (block.loc.z - half_block_size)
-		},
-		Vertex{
-			x: (block.loc.x + half_block_size),
-			y: (block.loc.y - half_block_size),
-			z: (block.loc.z - half_block_size)
-		},
-		Vertex{
-			x: (block.loc.x + half_block_size),
-			y: (block.loc.y + half_block_size),
-			z: (block.loc.z - half_block_size)
-		},
-		Vertex{
-			x: (block.loc.x - half_block_size),
-			y: (block.loc.y + half_block_size),
-			z: (block.loc.z - half_block_size)
-		},
-		Vertex{
-			x: (block.loc.x - half_block_size),
-			y: (block.loc.y - half_block_size),
-			z: (block.loc.z + half_block_size)
-		},
-		Vertex{
-			x: (block.loc.x + half_block_size),
-			y: (block.loc.y - half_block_size),
-			z: (block.loc.z + half_block_size)
-		},
-		Vertex{
-			x: (block.loc.x + half_block_size),
-			y: (block.loc.y + half_block_size),
-			z: (block.loc.z + half_block_size)
-		},
-		Vertex{
-			x: (block.loc.x - half_block_size),
-			y: (block.loc.y + half_block_size),
-			z: (block.loc.z + half_block_size)
-		}
-	]
-	block.edges = [
-		[0, 1], [1, 2], [2, 3], [3, 0], // back face
-		[4, 5], [5, 6], [6, 7], [7, 4], // front face
-		[0, 4], [1, 5], [2, 6], [3, 7]	// connecting sides
-	]
+	sz := texture.width * texture.height * 4
+	mut img_desc := gfx.ImageDesc{
+		width: texture.width
+		height: texture.height
+		num_mipmaps: 0
+		min_filter: .nearest
+		mag_filter: .nearest
+		wrap_u: .clamp_to_edge
+		wrap_v: .clamp_to_edge
+		label: &u8(0)
+		d3d11_texture: 0
+	}
+	img_desc.data.subimage[0][0] = gfx.Range{
+		ptr: block.texture.buffer
+		size: usize(sz)
+	}
+	block.gfx_texture = gfx.make_image(&img_desc)
 	return block
 }
 
-// draw draws the block to the buffered image.
-fn (mut block Block) draw(mut img BufferedImage) {
-	center := block.center()
-	for mut v in block.vertices {
-		v.x -= center.x
-		v.y -= center.y
-		v.z -= center.z
-		v.rotate(block.rot)
-		v.x += center.x
-		v.y += center.y
-		v.z += center.z
-	}
-	for edge in block.edges {
-		// game.g.draw_line_with_config(
-		// 	block.vertices[edge[0]].x, block.vertices[edge[0]].y,
-		// 	block.vertices[edge[1]].x, block.vertices[edge[1]].y,
-		// 	thickness: 2
-		// 	color: gx.red
-		// )
-		x1 := int(block.vertices[edge[0]].x)
-		y1 := int(block.vertices[edge[0]].y)
-		x2 := int(block.vertices[edge[1]].x)
-		y2 := int(block.vertices[edge[1]].y)
-		img.draw_line(x1, y1, x2, y2, gx.red)
-	}
-}
+fn (mut block Block) draw(mut game Game) {
+	sgl.defaults()
+	sgl.load_pipeline(game.g.pipeline.alpha)
 
-// center returns a `Vertex` coresponding to the center of the block.
-fn (mut block Block) center() Vertex {
-	mut c := Vertex{}
-	for v in block.vertices {
-		c.x += v.x
-		c.y += v.y
-		c.z += v.z
-	}
-	c.x /= block.vertices.len
-	c.y /= block.vertices.len
-	c.z /= block.vertices.len
-	return c
+	sgl.enable_texture()
+	sgl.texture(block.gfx_texture)
+
+	sgl.matrix_mode_projection()
+	sgl.perspective(game.fov, f32(width) / f32(height), 0.0, 100.0)
+
+	sgl.matrix_mode_modelview()
+	sgl.translate(block.loc.x + game.player.loc.x, block.loc.z + game.player.loc.z ,block.loc.y + game.player.loc.y)
+	// sgl.scale(-game.player.loc.x, game.player.loc.z, game.player.loc.y)
+
+	sgl.begin_quads()
+	sgl.c3f(1, 1, 1)
+	// edge coord
+	// x,y,z, texture cord: u,v
+	// sgl.rotate(-game.player.rot.yaw, 0.0, 1.0, 0.0)
+	// sgl.rotate(-game.player.rot.pitch, 1.0, 0.0, 0.0)
+	sgl.v3f_t2f(-1.0, 1.0, -1.0, 0.0, 0.66)
+	sgl.v3f_t2f(1.0, 1.0, -1.0, 0.25, 0.66)
+	sgl.v3f_t2f(1.0, -1.0, -1.0, 0.25, 0.33)
+	sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.0, 0.33)
+	sgl.push_matrix()
+	sgl.c3f(1, 1, 1)
+	sgl.v3f_t2f(-1.0, -1.0, 1.0, 0.25, 0.66)
+	sgl.v3f_t2f(1.0, -1.0, 1.0, 0.5, 0.66)
+	sgl.v3f_t2f(1.0, 1.0, 1.0, 0.5, 0.33)
+	sgl.v3f_t2f(-1.0, 1.0, 1.0, 0.25, 0.33)
+	sgl.c3f(1, 1, 1)
+	sgl.v3f_t2f(-1.0, -1.0, 1.0, 0.5, 0.66)
+	sgl.v3f_t2f(-1.0, 1.0, 1.0, 0.75, 0.66)
+	sgl.v3f_t2f(-1.0, 1.0, -1.0, 0.75, 0.33)
+	sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.5, 0.33)
+	sgl.c3f(1, 1, 1)
+	sgl.v3f_t2f(1.0, -1.0, 1.0, 0.75, 0.66)
+	sgl.v3f_t2f(1.0, -1.0, -1.0, 1.0, 0.66)
+	sgl.v3f_t2f(1.0, 1.0, -1.0, 1.0, 0.33)
+	sgl.v3f_t2f(1.0, 1.0, 1.0, 0.75, 0.33)
+	// sgl.c3f(r, g, b)
+	// sgl.v3f_t2f(1.0, -1.0, -1.0, 0.0, 0.25)
+	// sgl.v3f_t2f(1.0, -1.0, 1.0, 0.25, 0.25)
+	// sgl.v3f_t2f(-1.0, -1.0, 1.0, 0.25, 0.0)
+	// sgl.v3f_t2f(-1.0, -1.0, -1.0, 0.0, 0.0)
+	// sgl.c3f(r, g, b)
+	// sgl.v3f_t2f(-1.0, 1.0, -1.0, 0.0, 0.25)
+	// sgl.v3f_t2f(-1.0, 1.0, 1.0, 0.25, 0.25)
+	// sgl.v3f_t2f(1.0, 1.0, 1.0, 0.25, 0.0)
+	// sgl.v3f_t2f(1.0, 1.0, -1.0, 0.0, 0.0)
+	sgl.end()
+
+	sgl.pop_matrix()
+	sgl.disable_texture()
 }

@@ -2,6 +2,9 @@ module main
 
 import gg
 import time
+import sokol.sapp
+import sokol.gfx
+import sokol.sgl
 
 fn main() {
 	mut game := new_game()
@@ -16,12 +19,21 @@ fn C._sapp_glx_swapinterval(int)
 fn init(mut game Game) {
 	C._sapp_glx_swapinterval(0)
 
+	$if debug {
+		println('FOV: ${game.fov}')
+	}
+
 	game.init_textures() or {
 		println('Error: failed to load textures.')
 		println(err.msg())
 		exit(0)
 	}
-	game.block = new_block(1, 'block_grass', x: half_width, y: half_height)
+	grass_texture := new_bufferedimage_from_bytes($embed_file('./img/block_grass.png').to_bytes()) or {
+		println('Error: failed to load "block_grass.png"')
+		println(err.msg())
+		exit(0)
+	}
+	game.block = new_block(1, 'block_grass', grass_texture, x: 0, y: 0)
 
 	game.buffered_image = game.g.get_cached_image_by_idx(game.g.new_streaming_image(game.width, game.height, 4, gg.StreamingImageConfig{}))
 }

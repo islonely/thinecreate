@@ -59,6 +59,15 @@ fn (mut img BufferedImage) draw_pixel(x int, y int, color gx.Color) {
 	}
 }
 
+fn (mut img BufferedImage) draw_pixel_int(x int, y int, color int) {
+	if (x < 0 || y < 0) || (x > img.width || y > img.width) {
+		return
+	}
+	unsafe {
+		img.buffer[x + y * img.width] = color
+	}
+}
+
 // draw_line draws a line to the image data from (x0, y0) to (x1, y1).
 fn (mut img BufferedImage) draw_line(x0 int, y0 int, x1 int, y1 int, color gx.Color) {
 	mut x := x0
@@ -97,4 +106,20 @@ fn (mut img BufferedImage) draw_line(x0 int, y0 int, x1 int, y1 int, color gx.Co
 		}
 		error += 2 * dy
 	}
+}
+
+fn (mut img BufferedImage) draw_triangle(x0 int, y0 int, x1 int, y1 int, x2 int, y2 int, color gx.Color) {
+	img.draw_line(x0, y0, x1, y1, color)	
+	img.draw_line(x1, y1, x2, y2, color)	
+	img.draw_line(x2, y2, x0, y0, color)
+}
+
+fn (mut img BufferedImage) draw_filled_rectangle(x0 int, y0 int, x1 int, y1 int, color gx.Color) {
+	for x in x0..x1 {
+		img.draw_line(x, y0, x, y1, color)
+	}
+}
+
+fn (mut img BufferedImage) draw_filled_square(x int, y int, size int, color gx.Color) {
+	img.draw_filled_rectangle(x, y, x+size, y+size, color)
 }

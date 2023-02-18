@@ -2,6 +2,7 @@ import gg
 import gx
 import math
 import time
+import sokol.sgl
 
 const(
 	width = 1200
@@ -32,14 +33,14 @@ mut:
 
 	key_is_down map[gg.KeyCode]bool
 
-	mouse_sensitivity f32 = 1.0
+	mouse_sensitivity f32 = 0.5
 	player Player
 
 	textures []&BufferedImage
 
 	block Block
 
-	fov u8 = u8(math.round(1.0 / math.tan(80.0 / 2.0)))
+	fov f32 = 85.0 / 100.0
 }
 
 // GameState is all the available states the game can be in.
@@ -133,8 +134,7 @@ fn (mut game Game) update_playing(delta i64) {
 fn (mut game Game) draw() {
 	game.img.zero()
 	
-	game.draw_floor()
-	game.block.draw(mut game.img)
+	// game.draw_floor()
 	game.draw_ui()
 
 	game.buffered_image.update_pixel_data(game.img.buffer)
@@ -142,6 +142,7 @@ fn (mut game Game) draw() {
 	// anything drawn with gg.Context instead of drawing to the pixel buffer must
 	// being invoked after this here. I confused myself for a minute, so I'm just
 	// leaving a note.
+	game.block.draw(mut game)
 }
 
 // draw_ui draws the user interface to the screen
