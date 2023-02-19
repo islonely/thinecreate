@@ -40,3 +40,39 @@ fn (mut player Player) move_left(distance f32) {
 fn (mut player Player) move_right(distance f32) {
 	player.move_left(-distance)
 }
+
+// facing returns which direction the Player is facing.
+fn (player Player) facing() Facing {
+	y := player.rot.yaw
+	return if y > 337.5 {
+		.north
+	} else if y > 292.5 {
+		.northeast
+	} else if y > 247.5 {
+		.east
+	} else if y > 202.5 {
+		.southeast
+	} else if y > 157.5 {
+		.south
+	} else if y > 112.5 {
+		.southwest
+	} else if y > 67.5 {
+		.west
+	} else if y > 22.5 {
+		.northwest
+	} else {
+		.north
+	}
+}
+
+// Facing are the available directions the player can face.
+enum Facing {
+	north
+	northeast
+	east
+	southeast
+	south
+	southwest
+	west
+	northwest
+}

@@ -37,6 +37,7 @@ mut:
 	key_is_down map[gg.KeyCode]bool
 
 	mouse_sensitivity f32 = 0.5
+	invert_y_axis	  int = -1	// -1 for false, 1 for true
 	player            Player
 
 	block Block

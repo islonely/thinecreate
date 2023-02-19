@@ -1,4 +1,5 @@
 import gg
+import math
 import sokol.sapp
 
 // handle_mouse_move handles all mouse movements in game.
@@ -7,10 +8,29 @@ fn handle_mouse_move(x f32, y f32, mut game Game) {
 		sapp.lock_mouse(true)
 
 		yaw := (game.mouse_sensitivity * game.g.mouse_dx * 360) / game.width
-		game.player.rot.yaw += yaw
+		mult := f32(math.fmod(game.player.rot.yaw, 360) / 360) -0.5
+		yy := game.mouse_sensitivity * game.g.mouse_dy
+		dist_y := yy * math.cos(math.radians(game.player.rot.yaw))
+		dist_z := yy * math.sin(math.radians(game.player.rot.yaw))
+		pitch := (dist_y * mult * game.invert_y_axis) * 360 / game.height
+		roll := (dist_z * -mult * game.invert_y_axis) * 360 / game.height
+		game.player.rot.pitch += f32(pitch)
+		game.player.rot.roll += f32(roll)
 
-		pitch := (game.mouse_sensitivity * game.g.mouse_dy * 360) / game.height
-		game.player.rot.pitch += pitch
+		println('Multiplier: ${mult}')
+		println('Yaw: ${game.player.rot.yaw}')
+		println('Pitch: ${pitch}')
+		println('Roll: ${roll}')
+		println('Facing: ${game.player.facing()}')
+		println('')
+
+		game.player.rot.yaw += if game.player.rot.yaw + yaw > 180 {
+			-360 + yaw
+		} else if game.player.rot.yaw + yaw < -180 {
+			360 + yaw
+		} else {
+			yaw
+		}
 
 		if game.player.rot.pitch > 90 {
 			game.player.rot.pitch = 90
