@@ -1,12 +1,14 @@
+import arrays
 import gg
 import gx
 import time
 import sokol.sgl
+import sokol.gfx
 
 const (
-	width       = 1200
+	width       = 1920//1200
 	half_width  = width / 2
-	height      = 860
+	height      = 1080//860
 	half_height = height / 2
 )
 
@@ -16,15 +18,15 @@ struct Game {
 mut:
 	g         &gg.Context = unsafe { nil }
 	pipeline  sgl.Pipeline
-	init_flag bool
 	img       &BufferedImage = unsafe { nil }
-	gg_image  &gg.Image      = unsafe { nil }
 
 	width        int = width
 	half_width   int = half_width
 	height       int = height
 	half_height  int = half_height
 	aspect_ratio f32 = f32(width) / f32(height)
+	fov f32 = 90
+	fps_queue	 []int = []int{len: 100}
 
 	delta_time   i64
 	last_time    i64 = time.now().unix_time_milli()
@@ -37,11 +39,8 @@ mut:
 	mouse_sensitivity f32 = 0.5
 	player            Player
 
-	textures []&BufferedImage
-
 	block Block
-
-	fov f32 = 80
+	skybox_texture	  gfx.Image
 }
 
 // GameState is all the available states the game can be in.
@@ -71,20 +70,24 @@ fn new_game() &Game {
 		width: game.width
 		height: game.height
 	)
-	$if debug || fps ? {
-		game.g.fps.show = true
-	}
 	return game
 }
 
-fn (mut game Game) init_textures() ! {
-	// game.textures << new_bufferedimage_from_bytes($embed_file('./img/block_grass_bottom.png').to_bytes())!
-	// game.textures << new_bufferedimage_from_bytes($embed_file('./img/block_grass_side.png').to_bytes())!
-	// game.textures << new_bufferedimage_from_bytes($embed_file('./img/block_grass_top.png').to_bytes())!
+// fps returns the current frames per second.
+[inline]
+fn (game Game) fps() int {
+	sum := arrays.sum(game.fps_queue) or {
+		println(err.msg())
+		return -1
+	}
+	return sum / game.fps_queue.len
 }
 
 // update updates the game according to what GameState it's currently in.
 fn (mut game Game) update(delta i64) {
+	game.fps_queue.delete(0)
+	game.fps_queue << int(1000 / game.delta_time)
+
 	match game.state {
 		.dead {}
 		.inventory {}
@@ -132,16 +135,18 @@ fn (mut game Game) update_playing(delta i64) {
 // draw updates the buffered image and draws it to the screen.
 fn (mut game Game) draw() {
 	game.img.zero()
-
-	// game.draw_floor()
 	game.draw_ui()
 
-	game.gg_image.update_pixel_data(game.img.buffer)
-	game.g.draw_image(0, 0, game.width, game.height, game.gg_image)
-	// anything drawn with gg.Context instead of drawing to the pixel buffer must
-	// being invoked after this here. I confused myself for a minute, so I'm just
-	// leaving a note.
+	// game.gg_image.update_pixel_data(game.img.buffer)
+	game.g.draw_image(0, 0, game.width, game.height, game.img.to_ggimage(mut game))
+
+	game.g.begin()
+
+	game.draw_skybox()
 	game.block.draw(mut game)
+	game.draw_debug()
+	
+	game.g.end()
 }
 
 // draw_ui draws the user interface to the screen
@@ -153,4 +158,33 @@ fn (mut game Game) draw_ui() {
 		game.half_height + reticle_size, reticle_color)
 	game.img.draw_line(game.half_width - reticle_size, game.half_height, game.half_width +
 		reticle_size, game.half_height, reticle_color)
+}
+
+// draw_debug draws a debug menu to the screen
+fn (mut game Game) draw_debug() {
+	game.g.draw_text(20, 20, 'FPS: ${game.fps()}',
+					size: 20, color: gx.white)
+}
+
+// draw_skybox draws the sky around the camera.
+fn (mut game Game) draw_skybox() {
+	sgl.defaults()
+	sgl.load_pipeline(game.pipeline)
+
+	sgl.enable_texture()
+	sgl.texture(game.skybox_texture)
+	sgl.push_matrix()
+
+	sgl.matrix_mode_projection()
+	sgl.perspective(sgl.rad(game.fov), game.aspect_ratio, 0.1, 1000.0)
+	sgl.rotate(sgl.rad(-game.player.rot.yaw), 0.0, 1.0, 0.0)
+	sgl.rotate(sgl.rad(-game.player.rot.pitch), 1.0, 0.0, 0.0)
+	sgl.rotate(sgl.rad(-game.player.rot.roll), 0.0, 0.0, 1.0)
+	sgl.translate(0,0,0)
+
+	sgl.matrix_mode_modelview()
+	sgl_draw_cube(16)
+
+	sgl.pop_matrix()
+	sgl.disable_texture()
 }

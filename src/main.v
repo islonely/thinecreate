@@ -1,6 +1,5 @@
 module main
 
-import gg
 import time
 import sokol.gfx
 import sokol.sgl
@@ -21,7 +20,6 @@ fn init(mut game Game) {
 	C._sapp_glx_swapinterval(0)
 
 	// initialize pipeline
-	game.init_flag = true
 	mut pipe_desc := gfx.PipelineDesc{}
 	unsafe {
 		vmemset(&pipe_desc, 0, int(sizeof(pipe_desc)))
@@ -40,22 +38,13 @@ fn init(mut game Game) {
 		compare: .less_equal
 	}
 
-	pipe_desc.cull_mode = .back
+	// pipe_desc.cull_mode = .back
 	game.pipeline = sgl.make_pipeline(&pipe_desc)
-
-	// textures
-	game.init_textures() or {
-		println('Error: failed to load textures.')
-		println(err.msg())
-		exit(0)
-	}
 
 	// temp block
 	game.block = new_block(1, 'block_grass', texture_block_grass, x: 0, y: 0)
 
-	// cache buffered image
-	game.gg_image = game.g.get_cached_image_by_idx(game.g.new_streaming_image(game.width,
-		game.height, 4, gg.StreamingImageConfig{}))
+	game.skybox_texture = bufferedimage_to_gfximage(texture_misc_skybox, .linear)
 
 	println('END INIT')
 }
@@ -66,8 +55,6 @@ fn frame(mut game Game) {
 	game.delta_time = game.current_time - game.last_time
 	game.last_time = game.current_time
 
-	game.g.begin()
 	game.update(game.delta_time)
 	game.draw()
-	game.g.end()
 }
