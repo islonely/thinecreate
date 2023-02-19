@@ -49,18 +49,14 @@ fn init(mut game Game) {
 		println(err.msg())
 		exit(0)
 	}
-	grass_texture := new_bufferedimage_from_bytes($embed_file('./img/block_grass.png').to_bytes()) or {
-		println('Error: failed to load "block_grass.png"')
-		println(err.msg())
-		exit(0)
-	}
 
 	// temp block
-	game.block = new_block(1, 'block_grass', grass_texture, x: 0, y: 0)
+	game.block = new_block(1, 'block_grass', texture_block_grass, x: 0, y: 0)
 
 	// cache buffered image
-	game.gg_image = game.g.get_cached_image_by_idx(game.g.new_streaming_image(game.width, game.height, 4, gg.StreamingImageConfig{}))
-	
+	game.gg_image = game.g.get_cached_image_by_idx(game.g.new_streaming_image(game.width,
+		game.height, 4, gg.StreamingImageConfig{}))
+
 	println('END INIT')
 }
 

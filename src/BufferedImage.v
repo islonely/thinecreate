@@ -2,12 +2,18 @@ import gx
 import math
 import stbi
 
+// textures
+const (
+	texture_block_grass = new_bufferedimage_from_bytes_or_exit($embed_file('./img/block_grass.png').to_bytes())
+	texture_block_test  = new_bufferedimage_from_bytes_or_exit($embed_file('./img/block_test.png').to_bytes())
+)
+
 // BufferedImage is exactly what it says it is.
 [heap]
 struct BufferedImage {
 mut:
 	buffer &int = unsafe { nil }
-	width int
+	width  int
 	height int
 }
 
@@ -41,8 +47,16 @@ fn new_bufferedimage_from_bytes(b []u8) !&BufferedImage {
 	return new_bufferedimage_from_memory(b.data, b.len)!
 }
 
+fn new_bufferedimage_from_bytes_or_exit(b []u8) &BufferedImage {
+	return new_bufferedimage_from_bytes(b) or {
+		println('Failed to load texture.\nExiting...')
+		println(err.msg())
+		exit(0)
+	}
+}
+
 // zero sets the image data to 0s by reallocating the memory.
-// NOTE: I'm not sure if this is the optimal way to do this :| 
+// NOTE: I'm not sure if this is the optimal way to do this :|
 fn (mut img BufferedImage) zero() {
 	unsafe {
 		img.buffer = malloc(img.width * img.height * 4)
@@ -89,7 +103,7 @@ fn (mut img BufferedImage) draw_line(x0 int, y0 int, x1 int, y1 int, color gx.Co
 
 	mut error := 2 * dy - dx
 
-	for _ in 0..dx {
+	for _ in 0 .. dx {
 		img.draw_pixel(x, y, color)
 		for error > 0 {
 			if interchange {
@@ -109,17 +123,17 @@ fn (mut img BufferedImage) draw_line(x0 int, y0 int, x1 int, y1 int, color gx.Co
 }
 
 fn (mut img BufferedImage) draw_triangle(x0 int, y0 int, x1 int, y1 int, x2 int, y2 int, color gx.Color) {
-	img.draw_line(x0, y0, x1, y1, color)	
-	img.draw_line(x1, y1, x2, y2, color)	
+	img.draw_line(x0, y0, x1, y1, color)
+	img.draw_line(x1, y1, x2, y2, color)
 	img.draw_line(x2, y2, x0, y0, color)
 }
 
 fn (mut img BufferedImage) draw_filled_rectangle(x0 int, y0 int, x1 int, y1 int, color gx.Color) {
-	for x in x0..x1 {
+	for x in x0 .. x1 {
 		img.draw_line(x, y0, x, y1, color)
 	}
 }
 
 fn (mut img BufferedImage) draw_filled_square(x int, y int, size int, color gx.Color) {
-	img.draw_filled_rectangle(x, y, x+size, y+size, color)
+	img.draw_filled_rectangle(x, y, x + size, y + size, color)
 }
