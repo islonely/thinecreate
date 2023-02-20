@@ -1,20 +1,20 @@
 import math
 
+import transform { Vector3, Rotation }
+
 // 90 radians
 const rads90 = math.radians(90)
 
 // Player represents the player.
 struct Player {
 mut:
-	cameras				 []&Camera = []&Camera{cap: 3}
-	curr_cam			 int
+	cameras              []&Camera = []&Camera{cap: 3}
+	curr_cam             int
 	rot                  Rotation
-	loc                  Location
-	run_speed            f32      = 1.3 / 100
-	sneak_speed          f32      = 0.3 / 100
-	walk_forwards_speed  f32      = 0.9 / 100
-	walk_backwards_speed f32      = 0.7 / 100
-	strafe_speed         f32      = 0.7 / 100
+	pos                  Vector3
+	run_mult            f32 = 1.3
+	sneak_mult          f32 = 0.5
+	base_speed  f32 = 3
 }
 
 // new_player instantiates a Player with the provided cameras.
@@ -32,6 +32,46 @@ fn (mut player Player) toggle_camera() {
 	} else {
 		player.curr_cam + 1
 	}
+}
+
+// current_cam returns the current Camera selected.
+fn (mut player Player) current_cam() &Camera {
+	return player.cameras[player.curr_cam]
+}
+
+// on_key_down handles key presses for the Player.
+fn (mut player Player) on_key_down(keydown KeyDown, delta f32) {
+
+	mut cam := player.current_cam()
+
+	sneak := if keydown[.left_control] {
+		player.sneak_mult
+	} else {
+		1
+	}
+
+	run := if keydown[.left_shift] {
+		if sneak == 1 {
+			player.run_mult
+		} else {
+			1
+		}
+	} else {
+		1
+	}
+
+	if keydown[.w] {
+		cam.pos += cam.front.multf32(player.base_speed * sneak * run * delta)
+	} else if keydown[.s] {
+		cam.pos -= cam.front.multf32(player.base_speed * sneak * delta)
+	}
+	if keydown[.a] {
+		cam.pos -= cam.right.multf32(player.base_speed * sneak * run * delta)
+	} else if keydown[.d] {
+		cam.pos += cam.right.multf32(player.base_speed * sneak * run * delta)
+	}
+
+	player.pos = cam.pos
 }
 
 // facing returns which direction the Player is facing.

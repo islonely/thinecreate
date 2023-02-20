@@ -4,6 +4,8 @@ import time
 import sokol.gfx
 import sokol.sgl
 
+import textures
+
 fn main() {
 	mut game := new_game()
 	game.g.run()
@@ -42,9 +44,9 @@ fn init(mut game Game) {
 	game.pipeline = sgl.make_pipeline(&pipe_desc)
 
 	// temp block
-	game.block = new_block(1, 'block_grass', texture_block_grass, x: 0, y: 0)
+	game.block = new_block(1, 'block_grass', textures.block_grass, x: 0, y: 0)
 
-	game.skybox_texture = bufferedimage_to_gfximage(texture_misc_skybox, .linear)
+	game.skybox_texture = bufferedimage_to_gfximage(textures.misc_skybox, .linear)
 
 	println('END INIT')
 }

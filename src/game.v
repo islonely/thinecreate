@@ -5,10 +5,12 @@ import time
 import sokol.sgl
 import sokol.gfx
 
+import bufferedimage as bimg { BufferedImage }
+
 const (
-	width       = 1920//1200
+	width       = 1920 // 1200
 	half_width  = width / 2
-	height      = 1080//860
+	height      = 1080 // 860
 	half_height = height / 2
 )
 
@@ -16,17 +18,17 @@ const (
 [heap]
 struct Game {
 mut:
-	g         &gg.Context = unsafe { nil }
-	pipeline  sgl.Pipeline
-	img       &BufferedImage = unsafe { nil }
+	g        &gg.Context = unsafe { nil }
+	pipeline sgl.Pipeline
+	img      &BufferedImage = unsafe { nil }
 
-	width        int = width
-	half_width   int = half_width
-	height       int = height
-	half_height  int = half_height
-	aspect_ratio f32 = f32(width) / f32(height)
-	fov f32 = 90
-	fps_queue	 []int = []int{len: 100}
+	width        int   = width
+	half_width   int   = half_width
+	height       int   = height
+	half_height  int   = half_height
+	aspect_ratio f32   = f32(width) / f32(height)
+	fov          f32   = 90
+	fps_queue    []int = []int{len: 100}
 
 	delta_time   i64
 	last_time    i64 = time.now().unix_time_milli()
@@ -34,15 +36,17 @@ mut:
 
 	state GameState = .playing
 
-	key_is_down map[gg.KeyCode]bool
+	key_is_down KeyDown
 
 	mouse_sensitivity f32 = 0.5
-	invert_y_axis	  int = -1	// -1 for false, 1 for true
+	invert_y_axis     int = -1 // -1 for false, 1 for true
 	player            Player
 
-	block Block
-	skybox_texture	  gfx.Image
+	block          Block
+	skybox_texture gfx.Image
 }
+
+type KeyDown = map[gg.KeyCode]bool
 
 // GameState is all the available states the game can be in.
 enum GameState {
@@ -58,7 +62,7 @@ enum GameState {
 fn new_game() &Game {
 	mut game := &Game{}
 	// 4 for channels rgba
-	game.img = new_bufferedimage(game.width, game.height)
+	game.img = bimg.new(game.width, game.height)
 	game.g = gg.new_context(
 		user_data: game
 		init_fn: init
@@ -85,10 +89,20 @@ fn (game Game) fps() int {
 	return sum / game.fps_queue.len
 }
 
+// buffer_to_ggimg converts the BufferedImage at Game.img to gg.Image.
+fn (mut game Game) buffer_to_ggimg() gg.Image {
+	return game.g.create_image_from_memory(game.img.buffer, (game.img.width * game.img.height * game.img.channels))
+}
+
 // update updates the game according to what GameState it's currently in.
 fn (mut game Game) update() {
 	game.fps_queue.delete(0)
-	game.fps_queue << int(1000 / game.delta_time)
+	game.fps_queue << if game.delta_time == 0 {
+		game.fps_queue.last()
+	} else {
+		int(1000 / game.delta_time)
+	}
+	// I don't think this ^ is working correctly...
 
 	match game.state {
 		.dead {}
@@ -104,38 +118,7 @@ fn (mut game Game) update() {
 
 // update_playing updates the game while in GameState.playing.
 fn (mut game Game) update_playing() {
-	forward_speed := if game.key_is_down[.left_control] {
-		game.player.sneak_speed
-	} else if game.key_is_down[.left_shift] {
-		game.player.run_speed
-	} else {
-		game.player.walk_forwards_speed
-	}
-	backwards_speed := if game.key_is_down[.left_control] {
-		game.player.sneak_speed
-	} else {
-		game.player.walk_backwards_speed
-	}
-	strafe_speed := if game.key_is_down[.left_control] {
-		game.player.sneak_speed
-	} else {
-		game.player.strafe_speed
-	}
-
-	// if game.key_is_down[.w] {
-	// 	game.player.move_forward(f32(delta) * forward_speed)
-	// } else if game.key_is_down[.s] {
-	// 	game.player.move_backwards(f32(delta) * backwards_speed)
-	// }
-	// if game.key_is_down[.a] {
-	// 	game.player.move_left(f32(delta) * strafe_speed)
-	// } else if game.key_is_down[.d] {
-	// 	game.player.move_right(f32(delta) * strafe_speed)
-	// }
-
-	mut camera := game.player.cameras[game.player.curr_cam]
-	d := f32(game.delta_time)
-	
+	game.player.on_key_down(game.key_is_down, f32(game.delta_time))
 }
 
 // draw updates the buffered image and draws it to the screen.
@@ -144,14 +127,14 @@ fn (mut game Game) draw() {
 	game.draw_ui()
 
 	// game.gg_image.update_pixel_data(game.img.buffer)
-	game.g.draw_image(0, 0, game.width, game.height, game.img.to_ggimage(mut game))
+	game.g.draw_image(0, 0, game.width, game.height, game.buffer_to_ggimg())
 
 	game.g.begin()
 
 	game.draw_skybox()
 	game.block.draw(mut game)
 	game.draw_debug()
-	
+
 	game.g.end()
 }
 
@@ -169,7 +152,9 @@ fn (mut game Game) draw_ui() {
 // draw_debug draws a debug menu to the screen
 fn (mut game Game) draw_debug() {
 	game.g.draw_text(20, 20, 'FPS: ${game.fps()}',
-					size: 20, color: gx.white)
+		size: 20
+		color: gx.white
+	)
 }
 
 // draw_skybox draws the sky around the camera.
@@ -179,7 +164,7 @@ fn (mut game Game) draw_skybox() {
 	sgl.enable_texture()
 	sgl.texture(game.skybox_texture)
 	sgl.push_matrix()
-	sgl.translate(0,0,0)
+	sgl.translate(0, 0, 0)
 	game.player.cameras[game.player.curr_cam].sgl()
 	sgl.matrix_mode_modelview()
 	sgl_draw_cube(16)

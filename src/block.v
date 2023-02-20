@@ -1,6 +1,9 @@
 import sokol.sgl
 import sokol.gfx
 
+import bufferedimage { BufferedImage }
+import transform { Vector3 }
+
 // Block represents a block in the game.
 struct Block {
 pub:
@@ -10,16 +13,16 @@ pub:
 mut:
 	gfx_texture gfx.Image
 pub mut:
-	loc Location
+	pos Vector3
 }
 
 // new_block instantiates a `Block`.
-fn new_block(id int, name string, texture &BufferedImage, loc Location) &Block {
+fn new_block(id int, name string, texture &BufferedImage, pos Vector3) &Block {
 	mut block := &Block{
 		id: id
 		name: name
 		texture: texture
-		loc: loc
+		pos: pos
 	}
 	block.gfx_texture = bufferedimage_to_gfximage(block.texture, .nearest)
 	return block
@@ -32,7 +35,8 @@ fn (mut block Block) draw(mut game Game) {
 	sgl.enable_texture()
 	sgl.texture(block.gfx_texture)
 	sgl.push_matrix()
-	game.player.cameras[game.player.curr_cam].sgl()
+	mut cam := game.player.current_cam()
+	cam.sgl()
 	sgl.matrix_mode_modelview()
 	sgl_draw_cube(1)
 	sgl.pop_matrix()
