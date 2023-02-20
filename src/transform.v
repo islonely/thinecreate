@@ -18,3 +18,16 @@ __global:
 	y f32
 	z f32
 }
+
+struct Vector3 {
+__global:
+	x f32
+	y f32
+	z f32
+}
+
+struct Vector2 {
+__global:
+	x f32
+	y f32
+}

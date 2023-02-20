@@ -71,6 +71,7 @@ fn new_game() &Game {
 		width: game.width
 		height: game.height
 	)
+	game.player = new_player(new_camera(game.width, game.height, z: 5))
 	return game
 }
 
@@ -85,7 +86,7 @@ fn (game Game) fps() int {
 }
 
 // update updates the game according to what GameState it's currently in.
-fn (mut game Game) update(delta i64) {
+fn (mut game Game) update() {
 	game.fps_queue.delete(0)
 	game.fps_queue << int(1000 / game.delta_time)
 
@@ -95,14 +96,14 @@ fn (mut game Game) update(delta i64) {
 		.mainmenu {}
 		.paused {}
 		.playing {
-			game.update_playing(delta)
+			game.update_playing()
 		}
 		.settings {}
 	}
 }
 
 // update_playing updates the game while in GameState.playing.
-fn (mut game Game) update_playing(delta i64) {
+fn (mut game Game) update_playing() {
 	forward_speed := if game.key_is_down[.left_control] {
 		game.player.sneak_speed
 	} else if game.key_is_down[.left_shift] {
@@ -121,16 +122,20 @@ fn (mut game Game) update_playing(delta i64) {
 		game.player.strafe_speed
 	}
 
-	if game.key_is_down[.w] {
-		game.player.move_forward(f32(delta) * forward_speed)
-	} else if game.key_is_down[.s] {
-		game.player.move_backwards(f32(delta) * backwards_speed)
-	}
-	if game.key_is_down[.a] {
-		game.player.move_left(f32(delta) * strafe_speed)
-	} else if game.key_is_down[.d] {
-		game.player.move_right(f32(delta) * strafe_speed)
-	}
+	// if game.key_is_down[.w] {
+	// 	game.player.move_forward(f32(delta) * forward_speed)
+	// } else if game.key_is_down[.s] {
+	// 	game.player.move_backwards(f32(delta) * backwards_speed)
+	// }
+	// if game.key_is_down[.a] {
+	// 	game.player.move_left(f32(delta) * strafe_speed)
+	// } else if game.key_is_down[.d] {
+	// 	game.player.move_right(f32(delta) * strafe_speed)
+	// }
+
+	mut camera := game.player.cameras[game.player.curr_cam]
+	d := f32(game.delta_time)
+	
 }
 
 // draw updates the buffered image and draws it to the screen.
@@ -171,21 +176,13 @@ fn (mut game Game) draw_debug() {
 fn (mut game Game) draw_skybox() {
 	sgl.defaults()
 	sgl.load_pipeline(game.pipeline)
-
 	sgl.enable_texture()
 	sgl.texture(game.skybox_texture)
 	sgl.push_matrix()
-
-	sgl.matrix_mode_projection()
-	sgl.perspective(sgl.rad(game.fov), game.aspect_ratio, 0.1, 1000.0)
-	sgl.rotate(sgl.rad(-game.player.rot.yaw), 0.0, 1.0, 0.0)
-	sgl.rotate(sgl.rad(-game.player.rot.pitch), 1.0, 0.0, 0.0)
-	sgl.rotate(sgl.rad(-game.player.rot.roll), 0.0, 0.0, 1.0)
 	sgl.translate(0,0,0)
-
+	game.player.cameras[game.player.curr_cam].sgl()
 	sgl.matrix_mode_modelview()
 	sgl_draw_cube(16)
-
 	sgl.pop_matrix()
 	sgl.disable_texture()
 }

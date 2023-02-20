@@ -29,24 +29,12 @@ fn new_block(id int, name string, texture &BufferedImage, loc Location) &Block {
 fn (mut block Block) draw(mut game Game) {
 	sgl.defaults()
 	sgl.load_pipeline(game.pipeline)
-
 	sgl.enable_texture()
 	sgl.texture(block.gfx_texture)
 	sgl.push_matrix()
-
-	sgl.matrix_mode_projection()
-	sgl.perspective(sgl.rad(game.fov), game.aspect_ratio, 0.1, 1000.0)
-	sgl.rotate(sgl.rad(-game.player.rot.yaw), 0.0, 1.0, 0.0)
-	sgl.rotate(sgl.rad(-game.player.rot.pitch), 1.0, 0.0, 0.0)
-	sgl.rotate(sgl.rad(-game.player.rot.roll), 0.0, 0.0, 1.0)
-	x := block.loc.x + game.player.loc.x
-	y := block.loc.y + game.player.loc.y
-	z := block.loc.z + game.player.loc.z
-	sgl.translate(x, y, z)
-
+	game.player.cameras[game.player.curr_cam].sgl()
 	sgl.matrix_mode_modelview()
 	sgl_draw_cube(1)
-
 	sgl.pop_matrix()
 	sgl.disable_texture()
 }

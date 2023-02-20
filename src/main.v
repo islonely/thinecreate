@@ -55,6 +55,6 @@ fn frame(mut game Game) {
 	game.delta_time = game.current_time - game.last_time
 	game.last_time = game.current_time
 
-	game.update(game.delta_time)
+	game.update()
 	game.draw()
 }

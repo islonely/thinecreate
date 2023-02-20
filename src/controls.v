@@ -6,44 +6,36 @@ import sokol.sapp
 fn handle_mouse_move(x f32, y f32, mut game Game) {
 	if game.state == .playing {
 		sapp.lock_mouse(true)
-
-		yaw := (game.mouse_sensitivity * game.g.mouse_dx * 360) / game.width
-		mult := f32(math.fmod(game.player.rot.yaw, 360) / 360) -0.5
-		yy := game.mouse_sensitivity * game.g.mouse_dy
-		dist_y := yy * math.cos(math.radians(game.player.rot.yaw))
-		dist_z := yy * math.sin(math.radians(game.player.rot.yaw))
-		pitch := (dist_y * mult * game.invert_y_axis) * 360 / game.height
-		roll := (dist_z * -mult * game.invert_y_axis) * 360 / game.height
-		game.player.rot.pitch += f32(pitch)
-		game.player.rot.roll += f32(roll)
-
-		println('Multiplier: ${mult}')
-		println('Yaw: ${game.player.rot.yaw}')
-		println('Pitch: ${pitch}')
-		println('Roll: ${roll}')
 		println('Facing: ${game.player.facing()}')
 		println('')
 
-		game.player.rot.yaw += if game.player.rot.yaw + yaw > 180 {
+		mut camera := game.player.cameras[game.player.curr_cam]
+		yaw := f32(game.delta_time) * game.mouse_sensitivity * game.g.mouse_dx * 360 / camera.width * 0.05
+		pitch := f32(game.delta_time) * game.mouse_sensitivity * game.g.mouse_dy * 360 / camera.height * game.invert_y_axis * 0.05
+
+		println('yaw degrees: ${yaw}')
+		println(camera.rot.yaw)
+		camera.rot.pitch -= pitch
+		camera.rot.yaw += if camera.rot.yaw + yaw > 180 {
 			-360 + yaw
-		} else if game.player.rot.yaw + yaw < -180 {
+		} else if camera.rot.yaw + yaw < -180 {
 			360 + yaw
 		} else {
 			yaw
 		}
 
 		if game.player.rot.pitch > 90 {
-			game.player.rot.pitch = 90
-		} else if game.player.rot.pitch < -90 {
-			game.player.rot.pitch = -90
+			camera.rot.pitch = 90
+		} else if camera.rot.pitch < -90 {
+			camera.rot.pitch = -90
 		}
 
-		if game.player.rot.roll > 90 {
-			game.player.rot.roll = 90
-		} else if game.player.rot.roll < -90 {
-			game.player.rot.roll = -90
+		if camera.rot.roll > 90 {
+			camera.rot.roll = 90
+		} else if camera.rot.roll < -90 {
+			camera.rot.roll = -90
 		}
-		// println(game.player.rot)
+		// println(camera.rot)
 	} else {
 		sapp.lock_mouse(false)
 	}

@@ -6,12 +6,10 @@ const rads90 = math.radians(90)
 // Player represents the player.
 struct Player {
 mut:
+	cameras				 []&Camera = []&Camera{cap: 3}
+	curr_cam			 int
 	rot                  Rotation
-	loc                  Location = Location{
-		x: 0
-		y: 0
-		z: -6
-	}
+	loc                  Location
 	run_speed            f32      = 1.3 / 100
 	sneak_speed          f32      = 0.3 / 100
 	walk_forwards_speed  f32      = 0.9 / 100
@@ -19,26 +17,21 @@ mut:
 	strafe_speed         f32      = 0.7 / 100
 }
 
-// move_forward moves the player in the direction they're facing.
-fn (mut player Player) move_forward(distance f32) {
-	player.loc.x += distance * f32(math.sin(math.radians(player.rot.yaw)))
-	player.loc.z += distance * f32(math.cos(math.radians(player.rot.yaw)))
+// new_player instantiates a Player with the provided cameras.
+fn new_player(cams ...&Camera) Player {
+	return Player{
+		cameras: cams
+	}
 }
 
-// move_backwards moves the player in the opposite direction they're facing.
-fn (mut player Player) move_backwards(distance f32) {
-	player.move_forward(-distance)
-}
-
-// move_left moves the player horizontally to the left of where they're facing.
-fn (mut player Player) move_left(distance f32) {
-	player.loc.x -= distance * f32(math.sin(math.radians(player.rot.yaw) - rads90))
-	player.loc.z -= distance * f32(math.cos(math.radians(player.rot.yaw) - rads90))
-}
-
-// move_right moves the player horizontally to the right of where they're facing.
-fn (mut player Player) move_right(distance f32) {
-	player.move_left(-distance)
+// toggle_camera sets the current camera to the next Camera in
+// the array. Loops back to beginning when the end is reached.
+fn (mut player Player) toggle_camera() {
+	player.curr_cam = if (player.curr_cam + 1) == player.cameras.len {
+		0
+	} else {
+		player.curr_cam + 1
+	}
 }
 
 // facing returns which direction the Player is facing.
