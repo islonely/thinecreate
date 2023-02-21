@@ -1,7 +1,7 @@
 import sokol.sgl
 import sokol.gfx
 
-import bufferedimage { BufferedImage }
+import bufferedimage as buffered
 import transform { Vector3 }
 
 // Block represents a block in the game.
@@ -9,7 +9,7 @@ struct Block {
 pub:
 	id      int
 	name    string
-	texture &BufferedImage = unsafe { nil }
+	texture &buffered.Image = unsafe { nil }
 mut:
 	gfx_texture gfx.Image
 pub mut:
@@ -17,7 +17,7 @@ pub mut:
 }
 
 // new_block instantiates a `Block`.
-fn new_block(id int, name string, texture &BufferedImage, pos Vector3) &Block {
+fn new_block(id int, name string, texture &buffered.Image, pos Vector3) &Block {
 	mut block := &Block{
 		id: id
 		name: name

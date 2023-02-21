@@ -5,7 +5,7 @@ import time
 import sokol.sgl
 import sokol.gfx
 
-import bufferedimage as bimg { BufferedImage }
+import bufferedimage as buffered
 
 const (
 	width       = 1920 // 1200
@@ -20,7 +20,7 @@ struct Game {
 mut:
 	g        &gg.Context = unsafe { nil }
 	pipeline sgl.Pipeline
-	img      &BufferedImage = unsafe { nil }
+	img      &buffered.Image = unsafe { nil }
 
 	width        int   = width
 	half_width   int   = half_width
@@ -62,7 +62,7 @@ enum GameState {
 fn new_game() &Game {
 	mut game := &Game{}
 	// 4 for channels rgba
-	game.img = bimg.new(game.width, game.height)
+	game.img = buffered.new(game.width, game.height)
 	game.g = gg.new_context(
 		user_data: game
 		init_fn: init

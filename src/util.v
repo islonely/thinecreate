@@ -1,7 +1,9 @@
 import sokol.sgl
 import sokol.gfx
 
-fn bufferedimage_to_gfximage(buf_img &BufferedImage, filter gfx.Filter) gfx.Image {
+import bufferedimage as buffered
+
+fn bufferedimage_to_gfximage(buf_img &buffered.Image, filter gfx.Filter) gfx.Image {
 	size := buf_img.width * buf_img.height * 4
 	mut gfx_img_desc := gfx.ImageDesc{
 		width: buf_img.width
