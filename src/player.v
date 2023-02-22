@@ -61,17 +61,31 @@ fn (mut player Player) on_key_down(keydown KeyDown, delta f32) {
 	}
 
 	if keydown[.w] {
-		cam.pos += cam.front.multf32(player.base_speed * sneak * run * delta)
+		cam.pos += cam.eulers.multf32(player.base_speed * sneak * run * delta)
 	} else if keydown[.s] {
-		cam.pos -= cam.front.multf32(player.base_speed * sneak * delta)
+		cam.pos -= cam.eulers.multf32(player.base_speed * sneak * delta)
 	}
 	if keydown[.a] {
-		cam.pos -= cam.right.multf32(player.base_speed * sneak * run * delta)
+		cam.pos -= cam.eulers.multf32(player.base_speed * sneak * run * delta)
 	} else if keydown[.d] {
-		cam.pos += cam.right.multf32(player.base_speed * sneak * run * delta)
+		cam.pos += cam.eulers.multf32(player.base_speed * sneak * run * delta)
 	}
 
 	player.pos = cam.pos
+}
+
+// move moves the Player in the specified direction at a specified distance.
+fn (mut cam Camera) move(dir Facing, dist f32) {
+	match dir {
+		.north {}
+		.northeast {}
+		.east {}
+		.southeast {}
+		.south {}
+		.southwest {}
+		.west {}
+		.northwest {}
+	}
 }
 
 // facing returns which direction the Player is facing.

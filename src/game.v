@@ -91,7 +91,9 @@ fn (game Game) fps() int {
 
 // buffer_to_ggimg converts the BufferedImage at Game.img to gg.Image.
 fn (mut game Game) buffer_to_ggimg() gg.Image {
-	return game.g.create_image_from_memory(game.img.buffer, (game.img.width * game.img.height * game.img.channels))
+	img := game.g.create_image_from_memory(game.img.buffer, (game.img.width * game.img.height * game.img.channels))
+	game.g.cache_image(img)
+	return img
 }
 
 // update updates the game according to what GameState it's currently in.

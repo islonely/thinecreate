@@ -23,6 +23,7 @@ fn bufferedimage_to_gfximage(buf_img &buffered.Image, filter gfx.Filter) gfx.Ima
 	return gfx.make_image(&gfx_img_desc)
 }
 
+// sgl_draw_cube draws a cube to the scren using the sokol.sgl module.
 fn sgl_draw_cube(size int) {
 	// vfmt off
 	sgl.begin_quads()

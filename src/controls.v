@@ -8,7 +8,7 @@ fn handle_mouse_move(x f32, y f32, mut game Game) {
 		println('Facing: ${game.player.facing()}')
 
 		mut cam := game.player.current_cam()
-		cam.on_mouse_move(game.g.mouse_dx, game.g.mouse_dy, game.invert_y_axis, f32(game.delta_time))
+		cam.on_mouse_move(mut game)
 	} else {
 		sapp.lock_mouse(false)
 	}
