@@ -1,6 +1,6 @@
 import math
 
-import transform { Vector3, Rotation }
+import transform { Vector3 }
 
 // 90 radians
 const rads90 = math.radians(90)
@@ -13,7 +13,7 @@ mut:
 	curr_cam             int
 	rot                  Vector3
 	pos                  Vector3
-	run_mult            f32 = 1.3
+	run_mult            f32 = 1.4
 	sneak_mult          f32 = 0.5
 	base_speed  		f32 = 0.01
 }
@@ -63,21 +63,6 @@ fn (mut player Player) on_key_down(keydown KeyDown, delta f32) {
 		cam.pos -= cam.front.cross(cam.world_up).normalize().multf32(distance)
 	} else if keydown[.d] {
 		cam.pos += cam.front.cross(cam.world_up).normalize().multf32(distance)
-	}
-
-	// zoom in/out
-	if keydown[.c] {
-		cam.fov += if cam.fov > cam.min_fov {
-			f32(-0.5)
-		} else {
-			0
-		}
-	} else {
-		cam.fov += if cam.fov < cam.max_fov {
-			f32(0.5)
-		} else {
-			0
-		}
 	}
 
 	player.pos = cam.pos

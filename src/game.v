@@ -35,11 +35,10 @@ mut:
 	current_time i64
 
 	state GameState = .playing
+	settings Settings
 
 	key_is_down KeyDown
 
-	mouse_sensitivity f32 = 0.05
-	invert_y_axis     int = -1 // -1 for false, 1 for true
 	offsetx			  f32
 	offsety			  f32
 	lastx 			  f32
@@ -81,7 +80,7 @@ fn new_game() &Game {
 		width: game.width
 		height: game.height
 	)
-	game.player.cameras << new_camera(game.player, game.width, game.height, z: -2)
+	game.player.cameras << new_camera(game.player, game.width, game.height, game.settings.fov, z: -2)
 	return game
 }
 

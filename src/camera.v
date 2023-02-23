@@ -1,9 +1,10 @@
 import math { cos, radians, sin }
 import sokol.sgl
 
-import transform { Vector3, Rotation }
+import transform { Vector3 }
 
 // Camera the lens you look through to see the 3D space.
+[heap]
 struct Camera {
 pub mut:
 	world_up Vector3 = Vector3{
@@ -17,24 +18,21 @@ pub mut:
 
 	width  int
 	height int
-	min_fov    f32 = 80.0
-	max_fov    f32 = 90.0
 	fov        f32 = 90.0
 	near_plane f32 = 0.1
 	far_plane  f32 = 100.0
 
-	mouse_sensitivity f32 = 0.01
-
 	parent &Player
 }
 
-// new instantiates a Camera and returns it.
+// new_camera instantiates a Camera and returns it.
 [inline]
-fn new_camera(parent &Player, width int, height int, pos Vector3) &Camera {
+fn new_camera(parent &Player, width int, height int, fov f32, pos Vector3) &Camera {
 	return &Camera{
 		parent: parent
 		width: width
 		height: height
+		fov: fov
 		pos: pos
 	}
 }
@@ -56,7 +54,7 @@ fn (mut cam Camera) on_mouse_move() {
 	cam.front = cam.front.normalize()
 }
 
-// perspective
+// perspective sets the sgl matrix perspective.
 [inline]
 fn (cam Camera) perspective() {
 	sgl.perspective(cam.fov, cam.aspect_ratio(), cam.near_plane, cam.far_plane)
@@ -65,10 +63,11 @@ fn (cam Camera) perspective() {
 // update updates where the Camerea is currently looking at.
 fn (mut cam Camera) update() {
 	cam.perspective()
+	center := cam.pos + cam.front
 	// vmft off
 	sgl.lookat(
 		cam.pos.x, cam.pos.y, cam.pos.z,
-		(cam.pos.x + cam.front.x), (cam.pos.y + cam.front.y), (cam.pos.z + cam.front.z),
+		center.x, center.y, center.z,
 		cam.world_up.x, cam.world_up.y, cam.world_up.z
 	)
 	// vfmt on

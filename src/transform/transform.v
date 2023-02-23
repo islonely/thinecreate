@@ -2,15 +2,7 @@ module transform
 
 import math
 
-// Rotation is the orientation of an object.
-pub struct Rotation {
-__global:
-	pitch f32
-	yaw   f32
-	roll  f32
-}
-
-// Vector3
+// Vector3 represents a position in 3D space.
 pub struct Vector3 {
 __global:
 	x f32

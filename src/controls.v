@@ -6,9 +6,9 @@ fn handle_mouse_move(x f32, y f32, mut game Game) {
 	if game.state == .playing {
 		// sapp.show_mouse(false)
 
-		game.offsetx = (game.g.mouse_pos_x - game.lastx) * f32(game.delta_time) * game.mouse_sensitivity
+		game.offsetx = (game.g.mouse_pos_x - game.lastx) * f32(game.delta_time) * game.settings.mouse_sensitivity
 		// Y coords go from bottom to top, so we must reverse
-		game.offsety = (game.lasty - game.g.mouse_pos_y) * f32(game.delta_time) * game.mouse_sensitivity
+		game.offsety = (game.lasty - game.g.mouse_pos_y) * f32(game.delta_time) * game.settings.mouse_sensitivity * -game.settings.invert_y_axis
 		game.lastx, game.lasty = x, y
 
 		mut cam := game.player.camera()
