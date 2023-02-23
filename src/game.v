@@ -6,7 +6,6 @@ import time
 import sokol.sgl
 import sokol.gfx
 
-import bufferedimage as buffered
 import transform { Vector3 }
 
 const (
@@ -22,7 +21,6 @@ struct Game {
 mut:
 	g        &gg.Context = unsafe { nil }
 	pipeline sgl.Pipeline
-	img      &buffered.Image = unsafe { nil }
 
 	width        int   = width
 	half_width   int   = half_width
@@ -44,9 +42,11 @@ mut:
 	lastx 			  f32
 	lasty			  f32
 
-	player            &Player
-	block          Block
-	skybox_texture gfx.Image
+	player &Player
+	block  Block
+	chunk  Chunk
+
+	textures map[string][]gfx.Image
 }
 
 type KeyDown = map[gg.KeyCode]bool
@@ -66,8 +66,6 @@ fn new_game() &Game {
 	mut game := &Game{
 		player: &Player{}
 	}
-	// 4 for channels rgba
-	game.img = buffered.new(game.width, game.height)
 	game.g = gg.new_context(
 		user_data: game
 		init_fn: init
@@ -94,13 +92,6 @@ fn (game Game) fps() int {
 	return sum / game.fps_queue.len
 }
 
-// buffer_to_ggimg converts the BufferedImage at Game.img to gg.Image.
-fn (mut game Game) buffer_to_ggimg() gg.Image {
-	img := game.g.create_image_from_memory(game.img.buffer, (game.img.width * game.img.height * game.img.channels))
-	game.g.cache_image(img)
-	return img
-}
-
 // update updates the game according to what GameState it's currently in.
 fn (mut game Game) update() {
 	match game.state {
@@ -122,14 +113,9 @@ fn (mut game Game) update_playing() {
 
 // draw updates the buffered image and draws it to the screen.
 fn (mut game Game) draw() {
-	game.img.zero()
-	game.draw_ui()
-
-	// game.gg_image.update_pixel_data(game.img.buffer)
-	game.g.draw_image(0, 0, game.width, game.height, game.buffer_to_ggimg())
-
 	game.g.begin()
 
+	game.draw_ui()
 	game.draw_skybox()
 	game.block.draw(mut game)
 	game.draw_debug()
@@ -142,9 +128,9 @@ fn (mut game Game) draw_ui() {
 	// draw reticle
 	reticle_size := 10
 	reticle_color := gx.hex(0x333333cc)
-	game.img.draw_line(game.half_width, game.half_height - reticle_size, game.half_width,
+	game.g.draw_line(game.half_width, game.half_height - reticle_size, game.half_width,
 		game.half_height + reticle_size, reticle_color)
-	game.img.draw_line(game.half_width - reticle_size, game.half_height, game.half_width +
+	game.g.draw_line(game.half_width - reticle_size, game.half_height, game.half_width +
 		reticle_size, game.half_height, reticle_color)
 }
 
@@ -180,7 +166,7 @@ fn (mut game Game) draw_skybox() {
 	sgl.load_pipeline(game.pipeline)
 
 	sgl.enable_texture()
-	sgl.texture(game.skybox_texture)
+	sgl.texture(game.textures['misc'][0])
 	sgl.push_matrix()
 
 	sgl.matrix_mode_projection()

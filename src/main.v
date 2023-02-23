@@ -43,8 +43,8 @@ fn init(mut game Game) {
 	// pipe_desc.cull_mode = .back
 	game.pipeline = sgl.make_pipeline(&pipe_desc)
 
-	game.block = new_block(1, 'block_test', textures.block_test, z: -5)
-	game.skybox_texture = bufferedimage_to_gfximage(textures.misc_skybox, .linear)
+	game.textures = textures.init()
+	game.block = new_block(.grass, 'block_grass', z: -5)
 	
 	// Camera does not update until mouse moves, so we want to do it
 	// manually the first time before the mouse gets a chance to move.

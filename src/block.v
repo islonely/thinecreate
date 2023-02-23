@@ -1,30 +1,23 @@
 import sokol.sgl
-import sokol.gfx
 
-import bufferedimage as buffered
 import transform { Vector3 }
 
 // Block represents a block in the game.
 struct Block {
 pub:
-	id      int
-	name    string
-	texture &buffered.Image = unsafe { nil }
-mut:
-	gfx_texture gfx.Image
+	typ  BlockType = .test
+	name string
 pub mut:
 	pos Vector3
 }
 
 // new_block instantiates a `Block`.
-fn new_block(id int, name string, texture &buffered.Image, pos Vector3) &Block {
+fn new_block(typ BlockType, name string, pos Vector3) &Block {
 	mut block := &Block{
-		id: id
+		typ: typ
 		name: name
-		texture: texture
 		pos: pos
 	}
-	block.gfx_texture = bufferedimage_to_gfximage(block.texture, .nearest)
 	return block
 }
 
@@ -34,7 +27,7 @@ fn (mut block Block) draw(mut game Game) {
 	sgl.load_pipeline(game.pipeline)
 
 	sgl.enable_texture()
-	sgl.texture(block.gfx_texture)
+	sgl.texture(game.textures['blocks'][int(block.typ)])
 	sgl.push_matrix()
 
 	sgl.matrix_mode_projection()
@@ -48,4 +41,9 @@ fn (mut block Block) draw(mut game Game) {
 
 	sgl.pop_matrix()
 	sgl.disable_texture()
+}
+
+enum BlockType as int {
+	test = 0
+	grass
 }

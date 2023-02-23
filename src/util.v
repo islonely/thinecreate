@@ -1,28 +1,6 @@
 import sokol.sgl
-import sokol.gfx
 
-import bufferedimage as buffered
 import transform { Vector3 }
-
-fn bufferedimage_to_gfximage(buf_img &buffered.Image, filter gfx.Filter) gfx.Image {
-	size := buf_img.width * buf_img.height * 4
-	mut gfx_img_desc := gfx.ImageDesc{
-		width: buf_img.width
-		height: buf_img.height
-		num_mipmaps: 0
-		min_filter: filter
-		mag_filter: filter
-		wrap_u: .clamp_to_edge
-		wrap_v: .clamp_to_edge
-		label: &u8(0)
-		d3d11_texture: 0
-	}
-	gfx_img_desc.data.subimage[0][0] = gfx.Range{
-		ptr: buf_img.buffer
-		size: usize(size)
-	}
-	return gfx.make_image(&gfx_img_desc)
-}
 
 // sgl_draw_cube draws a cube to the scren using the sokol.sgl module.
 fn sgl_draw_cube(size int) {
