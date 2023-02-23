@@ -6,22 +6,16 @@ import transform { Vector3, Rotation }
 const rads90 = math.radians(90)
 
 // Player represents the player.
+[heap]
 struct Player {
 mut:
 	cameras              []&Camera = []&Camera{cap: 3}
 	curr_cam             int
-	rot                  Rotation
+	rot                  Vector3
 	pos                  Vector3
 	run_mult            f32 = 1.3
 	sneak_mult          f32 = 0.5
-	base_speed  f32 = 3
-}
-
-// new_player instantiates a Player with the provided cameras.
-fn new_player(cams ...&Camera) Player {
-	return Player{
-		cameras: cams
-	}
+	base_speed  		f32 = 0.01
 }
 
 // toggle_camera sets the current camera to the next Camera in
@@ -34,15 +28,14 @@ fn (mut player Player) toggle_camera() {
 	}
 }
 
-// current_cam returns the current Camera selected.
-fn (mut player Player) current_cam() &Camera {
+// camera returns a reference to the current Camera being used.
+fn (mut player Player) camera() &Camera {
 	return player.cameras[player.curr_cam]
 }
 
 // on_key_down handles key presses for the Player.
 fn (mut player Player) on_key_down(keydown KeyDown, delta f32) {
-
-	mut cam := player.current_cam()
+	mut cam := player.camera()
 
 	sneak := if keydown[.left_control] {
 		player.sneak_mult
@@ -60,15 +53,31 @@ fn (mut player Player) on_key_down(keydown KeyDown, delta f32) {
 		1
 	}
 
+	distance := player.base_speed * delta * sneak * run
 	if keydown[.w] {
-		cam.pos += cam.eulers.multf32(player.base_speed * sneak * run * delta)
+		cam.pos += cam.front.multf32(distance)
 	} else if keydown[.s] {
-		cam.pos -= cam.eulers.multf32(player.base_speed * sneak * delta)
+		cam.pos += cam.front.multf32(-distance)
 	}
 	if keydown[.a] {
-		cam.pos -= cam.eulers.multf32(player.base_speed * sneak * run * delta)
+		cam.pos -= cam.front.cross(cam.world_up).normalize().multf32(distance)
 	} else if keydown[.d] {
-		cam.pos += cam.eulers.multf32(player.base_speed * sneak * run * delta)
+		cam.pos += cam.front.cross(cam.world_up).normalize().multf32(distance)
+	}
+
+	// zoom in/out
+	if keydown[.c] {
+		cam.fov += if cam.fov > cam.min_fov {
+			f32(-0.5)
+		} else {
+			0
+		}
+	} else {
+		cam.fov += if cam.fov < cam.max_fov {
+			f32(0.5)
+		} else {
+			0
+		}
 	}
 
 	player.pos = cam.pos
@@ -90,22 +99,22 @@ fn (mut cam Camera) move(dir Facing, dist f32) {
 
 // facing returns which direction the Player is facing.
 fn (player Player) facing() Facing {
-	y := player.rot.yaw
-	return if y > 337.5 {
+	x := player.rot.x
+	return if x > 337.5 {
 		.north
-	} else if y > 292.5 {
+	} else if x > 292.5 {
 		.northeast
-	} else if y > 247.5 {
+	} else if x > 247.5 {
 		.east
-	} else if y > 202.5 {
+	} else if x > 202.5 {
 		.southeast
-	} else if y > 157.5 {
+	} else if x > 157.5 {
 		.south
-	} else if y > 112.5 {
+	} else if x > 112.5 {
 		.southwest
-	} else if y > 67.5 {
+	} else if x > 67.5 {
 		.west
-	} else if y > 22.5 {
+	} else if x > 22.5 {
 		.northwest
 	} else {
 		.north

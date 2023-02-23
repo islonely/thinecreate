@@ -43,9 +43,7 @@ fn init(mut game Game) {
 	// pipe_desc.cull_mode = .back
 	game.pipeline = sgl.make_pipeline(&pipe_desc)
 
-	// temp block
-	game.block = new_block(1, 'block_grass', textures.block_grass, x: 0, y: 0)
-
+	game.block = new_block(1, 'block_test', textures.block_test, z: -5)
 	game.skybox_texture = bufferedimage_to_gfximage(textures.misc_skybox, .linear)
 
 	println('END INIT')

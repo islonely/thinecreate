@@ -4,13 +4,34 @@ import sokol.sapp
 // handle_mouse_move handles all mouse movements in game.
 fn handle_mouse_move(x f32, y f32, mut game Game) {
 	if game.state == .playing {
-		sapp.lock_mouse(true)
-		println('Facing: ${game.player.facing()}')
+		// sapp.show_mouse(false)
 
-		mut cam := game.player.current_cam()
-		cam.on_mouse_move(mut game)
+		game.offsetx = (game.g.mouse_pos_x - game.lastx) * f32(game.delta_time) * game.mouse_sensitivity
+		// Y coords go from bottom to top, so we must reverse
+		game.offsety = (game.lasty - game.g.mouse_pos_y) * f32(game.delta_time) * game.mouse_sensitivity
+		game.lastx, game.lasty = x, y
+
+		mut cam := game.player.camera()
+		new_yaw := cam.yaw + game.offsetx
+		new_pitch := cam.pitch + game.offsety
+		cam.yaw += if new_yaw > 360 {
+			game.offsetx - 360
+		} else if new_yaw < 0 {
+			game.offsetx + 360
+		} else {
+			game.offsetx
+		}
+
+		if new_pitch > 89 {
+			cam.pitch = 89	
+		} else if new_pitch < -89 {
+			cam.pitch = -89
+		} else {
+			cam.pitch = new_pitch
+		}
+		cam.on_mouse_move()
 	} else {
-		sapp.lock_mouse(false)
+		sapp.show_mouse(true)
 	}
 }
 

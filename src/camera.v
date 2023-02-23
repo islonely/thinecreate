@@ -1,93 +1,75 @@
 import math { cos, radians, sin }
 import sokol.sgl
-import time
 
 import transform { Vector3, Rotation }
 
 // Camera the lens you look through to see the 3D space.
 struct Camera {
 pub mut:
-	pos Vector3 = Vector3{
-		z: -2
-	}
-	eulers Vector3
-
 	world_up Vector3 = Vector3{
-		z: 1
+		y: 1
 	}
+	pos Vector3
 	front Vector3
-	right Vector3
-	up    Vector3
+
+	yaw   f32 = -90
+	pitch f32
 
 	width  int
 	height int
-
+	min_fov    f32 = 80.0
+	max_fov    f32 = 90.0
 	fov        f32 = 90.0
 	near_plane f32 = 0.1
-	far_plane  f32 = 1000.0
+	far_plane  f32 = 100.0
 
 	mouse_sensitivity f32 = 0.01
+
+	parent &Player
 }
 
 // new instantiates a Camera and returns it.
-fn new_camera(width int, height int, pos Vector3) &Camera {
+[inline]
+fn new_camera(parent &Player, width int, height int, pos Vector3) &Camera {
 	return &Camera{
+		parent: parent
 		width: width
 		height: height
 		pos: pos
 	}
 }
 
-// aspect_ratio calculates the aspect ratio of the Camera
-// and returns it.
+// aspect_ratio calculates the aspect ratio of the Camera and returns it.
+[inline]
 fn (cam Camera) aspect_ratio() f32 {
 	return f32(width) / f32(height)
 }
 
-// sgl changes the position of the Camerea relative to
-// location, orientation, and up.
-fn (mut cam Camera) sgl() {
-	sgl.matrix_mode_projection()
-	sgl.perspective(sgl.rad(cam.fov), cam.aspect_ratio(), cam.near_plane, cam.far_plane)
-
-	// vfmt off
-	// alpha := sin(radians(cam.eulers.y))
-	// cam.front = Vector3{
-	// 	x: f32(alpha * cos(radians(cam.eulers.z)))
-	// 	y: f32(alpha * sin(radians(cam.eulers.z)))
-	// 	z: f32(cos(radians(cam.eulers.y)))
-	// }
-	// cam.right = cam.front.cross(cam.world_up)
-	// cam.up = cam.right.cross(cam.front)
-	// center := cam.pos + cam.front
-	// sgl.lookat(
-	// 	cam.pos.x, cam.pos.x, cam.pos.y,
-	// 	center.x, center.y, center.z,
-	// 	cam.up.x, cam.up.y, cam.up.z
-	// )
-	// vfmt on
-
-	sgl.translate(cam.pos.x, cam.pos.y, cam.pos.z)
-	sgl.rotate(f32(radians(cam.eulers.x)), 0, 1, 0)
-	sgl.rotate(f32(radians(cam.eulers.y)), 1, 0, 0)
+// on_mouse_move changes euler angles of the camera relative to mouse movement.
+fn (mut cam Camera) on_mouse_move() {
+	cos_pitch := cos(radians(cam.pitch))
+	cam.front = Vector3{
+		x: f32(cos(radians(cam.yaw)) * cos_pitch)
+		y: f32(sin(radians(cam.pitch)))
+		z: f32(sin(radians(cam.yaw)) * cos_pitch)
+	}
+	cam.front = cam.front.normalize()
 }
 
-// on_mouse_move changes euler angles of the camera relative to mouse movement.
-fn (mut cam Camera) on_mouse_move(mut game Game) {
-	rotx := cam.mouse_sensitivity * f32(game.delta_time) * game.g.mouse_dx
-	roty := cam.mouse_sensitivity * f32(game.delta_time) * game.g.mouse_dy
+// perspective
+[inline]
+fn (cam Camera) perspective() {
+	sgl.perspective(cam.fov, cam.aspect_ratio(), cam.near_plane, cam.far_plane)
+}
 
-	cam.eulers += Vector3{
-		x: if (cam.eulers.x + rotx) > 180 {
-			rotx - 360
-		} else if (cam.eulers.x + rotx) < -180 {
-			rotx + 360
-		} else {
-			rotx
-		}
-		y: roty
-	}
-
-	println('X: ${cam.eulers.x} degrees')
-	println('Y: ${cam.eulers.y} degrees')
+// update updates where the Camerea is currently looking at.
+fn (mut cam Camera) update() {
+	cam.perspective()
+	// vmft off
+	sgl.lookat(
+		cam.pos.x, cam.pos.y, cam.pos.z,
+		(cam.pos.x + cam.front.x), (cam.pos.y + cam.front.y), (cam.pos.z + cam.front.z),
+		cam.world_up.x, cam.world_up.y, cam.world_up.z
+	)
+	// vfmt on
 }

@@ -2,6 +2,7 @@ import sokol.sgl
 import sokol.gfx
 
 import bufferedimage as buffered
+import transform { Vector3 }
 
 fn bufferedimage_to_gfximage(buf_img &buffered.Image, filter gfx.Filter) gfx.Image {
 	size := buf_img.width * buf_img.height * 4
@@ -60,6 +61,5 @@ fn sgl_draw_cube(size int) {
 		sgl.v3f_t2f( size, size,  size,		0.5,  0.33333334)
 		sgl.v3f_t2f( size, size, -size,		0.5,  0.0)
 	}
-	sgl.end()
 	// vfmt on
 }

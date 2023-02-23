@@ -1,11 +1,13 @@
 import arrays
 import gg
 import gx
+import math { sin, cos }
 import time
 import sokol.sgl
 import sokol.gfx
 
 import bufferedimage as buffered
+import transform { Vector3 }
 
 const (
 	width       = 1920 // 1200
@@ -26,8 +28,6 @@ mut:
 	half_width   int   = half_width
 	height       int   = height
 	half_height  int   = half_height
-	aspect_ratio f32   = f32(width) / f32(height)
-	fov          f32   = 90
 	fps_queue    []int = []int{len: 100}
 
 	delta_time   i64
@@ -38,10 +38,14 @@ mut:
 
 	key_is_down KeyDown
 
-	mouse_sensitivity f32 = 0.5
+	mouse_sensitivity f32 = 0.05
 	invert_y_axis     int = -1 // -1 for false, 1 for true
-	player            Player
+	offsetx			  f32
+	offsety			  f32
+	lastx 			  f32
+	lasty			  f32
 
+	player            &Player
 	block          Block
 	skybox_texture gfx.Image
 }
@@ -60,7 +64,9 @@ enum GameState {
 
 // new_game instantiates a Game and returns a reference to it.
 fn new_game() &Game {
-	mut game := &Game{}
+	mut game := &Game{
+		player: &Player{}
+	}
 	// 4 for channels rgba
 	game.img = buffered.new(game.width, game.height)
 	game.g = gg.new_context(
@@ -75,7 +81,7 @@ fn new_game() &Game {
 		width: game.width
 		height: game.height
 	)
-	game.player = new_player(new_camera(game.width, game.height, z: 5))
+	game.player.cameras << new_camera(game.player, game.width, game.height, z: -2)
 	return game
 }
 
@@ -98,14 +104,6 @@ fn (mut game Game) buffer_to_ggimg() gg.Image {
 
 // update updates the game according to what GameState it's currently in.
 fn (mut game Game) update() {
-	game.fps_queue.delete(0)
-	game.fps_queue << if game.delta_time == 0 {
-		game.fps_queue.last()
-	} else {
-		int(1000 / game.delta_time)
-	}
-	// I don't think this ^ is working correctly...
-
 	match game.state {
 		.dead {}
 		.inventory {}
@@ -159,17 +157,51 @@ fn (mut game Game) draw_debug() {
 	)
 }
 
+// aspect_ratio returns the aspect ratio of the Game.
+[inline]
+fn (mut game Game) aspect_ratio() f32 {
+	return f32(game.width) / f32(game.height)
+}
+
+// perspective
+[inline]
+fn (mut game Game) perspective() {
+	sgl.perspective(sgl.rad(game.camera().fov), game.aspect_ratio(), game.camera().near_plane, game.camera().far_plane)
+}
+
+// camera returns a reference to the current Camera being used.
+[inline]
+fn (mut game Game) camera() &Camera {
+	return game.player.camera()
+}
+
 // draw_skybox draws the sky around the camera.
 fn (mut game Game) draw_skybox() {
 	sgl.defaults()
 	sgl.load_pipeline(game.pipeline)
+
 	sgl.enable_texture()
 	sgl.texture(game.skybox_texture)
 	sgl.push_matrix()
-	sgl.translate(0, 0, 0)
-	game.player.cameras[game.player.curr_cam].sgl()
+
+	sgl.matrix_mode_projection()
+	
+	// We need custom lookat here so the skybox doesn't move towards or away
+	// from the Player, but still rotates.
+	mut cam := game.camera()
+	cam.perspective()
+	// vmft off
+	sgl.lookat(
+		0, 0, 0,
+		cam.front.x, cam.front.y, cam.front.z,
+		cam.world_up.x, cam.world_up.y, cam.world_up.z
+	)
+	// vfmt on
+
 	sgl.matrix_mode_modelview()
-	sgl_draw_cube(16)
+	sgl_draw_cube(32)
+	sgl.end()
+	
 	sgl.pop_matrix()
 	sgl.disable_texture()
 }

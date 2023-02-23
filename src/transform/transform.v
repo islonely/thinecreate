@@ -19,6 +19,7 @@ __global:
 }
 
 // + adds the two Vector3's together.
+[inline]
 pub fn (a Vector3) + (b Vector3) Vector3 {
 	return Vector3{
 		x: a.x + b.x
@@ -28,6 +29,7 @@ pub fn (a Vector3) + (b Vector3) Vector3 {
 }
 
 // + adds the two Vector3's together.
+[inline]
 pub fn (a Vector3) - (b Vector3) Vector3 {
 	return Vector3{
 		x: a.x - b.x
@@ -37,6 +39,7 @@ pub fn (a Vector3) - (b Vector3) Vector3 {
 }
 
 // * multiplies two Vector3's together.
+[inline]
 pub fn (a Vector3) * (b Vector3) Vector3 {
 	return Vector3{
 		x: a.x * b.x
@@ -46,6 +49,7 @@ pub fn (a Vector3) * (b Vector3) Vector3 {
 }
 
 // multf32 multiplies X, Y, and Z by one value.
+[inline]
 pub fn (a Vector3) multf32(val f32) Vector3 {
 	return a * Vector3{val, val, val}
 }
@@ -71,6 +75,7 @@ pub fn (vec Vector3) normalize() Vector3 {
 }
 
 // cross product
+[inline]
 pub fn (a Vector3) cross(b Vector3) Vector3 {
 	return Vector3{
 		x: (a.y * b.z) - (a.z * b.y)
@@ -80,6 +85,7 @@ pub fn (a Vector3) cross(b Vector3) Vector3 {
 }
 
 // vec2
+[inline]
 pub fn (vec Vector3) vec2() Vector2 {
 	return Vector2{
 		x: vec.x
@@ -95,6 +101,7 @@ __global:
 }
 
 // vec3
+[inline]
 pub fn (vec Vector2) vec3() Vector3 {
 	return Vector3{
 		x: vec.x

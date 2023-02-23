@@ -32,13 +32,20 @@ fn new_block(id int, name string, texture &buffered.Image, pos Vector3) &Block {
 fn (mut block Block) draw(mut game Game) {
 	sgl.defaults()
 	sgl.load_pipeline(game.pipeline)
+
 	sgl.enable_texture()
 	sgl.texture(block.gfx_texture)
 	sgl.push_matrix()
-	mut cam := game.player.current_cam()
-	cam.sgl()
+
+	sgl.matrix_mode_projection()
+	mut cam := game.camera()
+	cam.update()
+
 	sgl.matrix_mode_modelview()
 	sgl_draw_cube(1)
+	sgl.translate(block.pos.x, block.pos.y, block.pos.z)
+	sgl.end()
+
 	sgl.pop_matrix()
 	sgl.disable_texture()
 }
