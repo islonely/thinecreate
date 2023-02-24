@@ -30,6 +30,11 @@ fn handle_mouse_move(x f32, y f32, mut game Game) {
 			cam.pitch = new_pitch
 		}
 		cam.on_mouse_move()
+
+		{	// wraps mouse to other side of window if it passes
+			// a certain threshold.
+			// TODO: this ^
+		}
 	} else {
 		sapp.show_mouse(true)
 	}

@@ -26,7 +26,7 @@ mut:
 	half_width   int   = half_width
 	height       int   = height
 	half_height  int   = half_height
-	fps_queue    []int = []int{len: 100}
+	fps_queue    []f32 = []f32{len: 100}
 
 	delta_time   i64
 	last_time    i64 = time.now().unix_time_milli()
@@ -43,8 +43,7 @@ mut:
 	lasty			  f32
 
 	player &Player
-	block  Block
-	chunk  Chunk
+	chunks  []&Chunk
 
 	textures map[string][]gfx.Image
 }
@@ -55,6 +54,7 @@ type KeyDown = map[gg.KeyCode]bool
 enum GameState {
 	dead
 	inventory
+	loading
 	mainmenu
 	paused
 	playing
@@ -78,7 +78,7 @@ fn new_game() &Game {
 		width: game.width
 		height: game.height
 	)
-	game.player.cameras << new_camera(game.player, game.width, game.height, game.settings.fov, z: -2)
+	game.player.cameras << new_camera(game.player, game.width, game.height, game.settings.fov)
 	return game
 }
 
@@ -89,14 +89,18 @@ fn (game Game) fps() int {
 		println(err.msg())
 		return -1
 	}
-	return sum / game.fps_queue.len
+	return int(sum) / game.fps_queue.len
 }
 
 // update updates the game according to what GameState it's currently in.
 fn (mut game Game) update() {
+	game.fps_queue.delete(0)
+	game.fps_queue << 1000 / f32(game.delta_time)
+
 	match game.state {
 		.dead {}
 		.inventory {}
+		.loading {}
 		.mainmenu {}
 		.paused {}
 		.playing {
@@ -115,9 +119,31 @@ fn (mut game Game) update_playing() {
 fn (mut game Game) draw() {
 	game.g.begin()
 
-	game.draw_ui()
+	{	// allows us to draw in 3D space without interfering
+		// with the 2D draw functions.
+		sgl.viewport(0, 0, game.width, game.height, true)
+		sgl.matrix_mode_projection()
+		sgl.load_identity()
+		game.camera().perspective()
+		sgl.matrix_mode_modelview()
+		sgl.load_identity()
+	}
+
 	game.draw_skybox()
-	game.block.draw(mut game)
+	for mut chunk in game.chunks {
+		chunk.draw(mut game)
+	}
+	
+	{	// allows us to write and draw in 2D space without distorting
+		// text and shapes with the 3D view.
+		sgl.matrix_mode_projection()
+		sgl.load_identity()
+		sgl.ortho(0.0, game.width, game.height, 0.0, -1.0, 10.0)
+		sgl.matrix_mode_modelview()
+		sgl.load_identity()
+	}
+
+	game.draw_ui()
 	game.draw_debug()
 
 	game.g.end()
@@ -126,8 +152,8 @@ fn (mut game Game) draw() {
 // draw_ui draws the user interface to the screen
 fn (mut game Game) draw_ui() {
 	// draw reticle
-	reticle_size := 10
-	reticle_color := gx.hex(0x333333cc)
+	reticle_size := 12
+	reticle_color := gx.black
 	game.g.draw_line(game.half_width, game.half_height - reticle_size, game.half_width,
 		game.half_height + reticle_size, reticle_color)
 	game.g.draw_line(game.half_width - reticle_size, game.half_height, game.half_width +
@@ -136,8 +162,31 @@ fn (mut game Game) draw_ui() {
 
 // draw_debug draws a debug menu to the screen
 fn (mut game Game) draw_debug() {
-	game.g.draw_text(20, 20, 'FPS: ${game.fps()}',
-		size: 20
+	mut row := 0
+	padding := 8
+	size := 24
+	bg := gx.hex(0x00000033)
+
+	
+	game.g.draw_rect_filled(7, 5, 300, 24*3+6, bg)
+
+	fps := 'FPS: ${game.fps()}'
+	game.g.draw_text(10, (row * size + padding), fps,
+		size: size
+		color: gx.white
+	)
+
+	row++
+	pos := 'Position: X: ${int(game.player.pos.x)}, Y: ${int(game.player.pos.y)}, Z: ${int(game.player.pos.z)}'
+	game.g.draw_text(10, (row * size + padding), pos,
+		size: size
+		color: gx.white
+	)
+
+	facing := 'Facing: ${game.player.facing().str().trim_left('.')}'
+	row++
+	game.g.draw_text(10, (row * size + padding), facing,
+		size: size
 		color: gx.white
 	)
 }

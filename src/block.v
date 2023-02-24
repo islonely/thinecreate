@@ -7,22 +7,46 @@ struct Block {
 pub:
 	typ  BlockType = .test
 	name string
+	invisible bool
+	collision bool = true
+	suffocates bool = true
 pub mut:
 	pos Vector3
 }
 
-// new_block instantiates a `Block`.
-fn new_block(typ BlockType, name string, pos Vector3) &Block {
-	mut block := &Block{
+[params]
+struct BlockProperties {
+	invisible bool
+	collision bool = true
+	suffocates bool = true
+}
+
+// new_block instantiates a Block.
+[inline]
+fn new_block(typ BlockType, name string, pos Vector3, props BlockProperties) &Block {
+	return &Block{
 		typ: typ
 		name: name
 		pos: pos
+		invisible: props.invisible
+		collision: props.collision
+		suffocates: props.suffocates
 	}
-	return block
 }
 
-// draw renders the block to the screen
+// new_air_block instantiates an air Block.
+[inline]
+fn new_air_block(pos Vector3) &Block {
+	return new_block(.air, 'block_air', pos, invisible: true, collision: false, suffocates: false)
+}
+
+// draw renders the block to the screen.
+[direct_array_access]
 fn (mut block Block) draw(mut game Game) {
+	if block.invisible {
+		return
+	}
+
 	sgl.defaults()
 	sgl.load_pipeline(game.pipeline)
 
@@ -35,7 +59,7 @@ fn (mut block Block) draw(mut game Game) {
 	cam.update()
 
 	sgl.matrix_mode_modelview()
-	sgl_draw_cube(1)
+	sgl_draw_cube(0.5)
 	sgl.translate(block.pos.x, block.pos.y, block.pos.z)
 	sgl.end()
 
@@ -44,6 +68,12 @@ fn (mut block Block) draw(mut game Game) {
 }
 
 enum BlockType as int {
-	test = 0
+	air
+	dirt
+	glass
 	grass
+	stone
+
+	test
+	block_count
 }

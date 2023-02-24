@@ -1,9 +1,4 @@
-import math
-
 import transform { Vector3 }
-
-// 90 radians
-const rads90 = math.radians(90)
 
 // Player represents the player.
 [heap]
@@ -11,8 +6,10 @@ struct Player {
 mut:
 	cameras              []&Camera = []&Camera{cap: 3}
 	curr_cam             int
-	rot                  Vector3
-	pos                  Vector3
+	pos                  Vector3 = Vector3{
+		y: 60
+		z: -2
+	}
 	run_mult            f32 = 1.4
 	sneak_mult          f32 = 0.5
 	base_speed  		f32 = 0.01
@@ -29,6 +26,7 @@ fn (mut player Player) toggle_camera() {
 }
 
 // camera returns a reference to the current Camera being used.
+[direct_array_access]
 fn (mut player Player) camera() &Camera {
 	return player.cameras[player.curr_cam]
 }
@@ -53,6 +51,7 @@ fn (mut player Player) on_key_down(keydown KeyDown, delta f32) {
 		1
 	}
 
+	// TODO: make it so player cannot move vertically.
 	distance := player.base_speed * delta * sneak * run
 	if keydown[.w] {
 		cam.pos += cam.front.multf32(distance)
@@ -68,38 +67,24 @@ fn (mut player Player) on_key_down(keydown KeyDown, delta f32) {
 	player.pos = cam.pos
 }
 
-// move moves the Player in the specified direction at a specified distance.
-fn (mut cam Camera) move(dir Facing, dist f32) {
-	match dir {
-		.north {}
-		.northeast {}
-		.east {}
-		.southeast {}
-		.south {}
-		.southwest {}
-		.west {}
-		.northwest {}
-	}
-}
-
 // facing returns which direction the Player is facing.
-fn (player Player) facing() Facing {
-	x := player.rot.x
-	return if x > 337.5 {
+fn (mut player Player) facing() Facing {
+	yaw := player.camera().yaw
+	return if yaw > 337.5 {
 		.north
-	} else if x > 292.5 {
+	} else if yaw > 292.5 {
 		.northeast
-	} else if x > 247.5 {
+	} else if yaw > 247.5 {
 		.east
-	} else if x > 202.5 {
+	} else if yaw > 202.5 {
 		.southeast
-	} else if x > 157.5 {
+	} else if yaw > 157.5 {
 		.south
-	} else if x > 112.5 {
+	} else if yaw > 112.5 {
 		.southwest
-	} else if x > 67.5 {
+	} else if yaw > 67.5 {
 		.west
-	} else if x > 22.5 {
+	} else if yaw > 22.5 {
 		.northwest
 	} else {
 		.north

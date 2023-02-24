@@ -22,29 +22,33 @@ fn init(mut game Game) {
 	C._sapp_glx_swapinterval(0)
 
 	// initialize pipeline
-	mut pipe_desc := gfx.PipelineDesc{}
-	unsafe {
-		vmemset(&pipe_desc, 0, int(sizeof(pipe_desc)))
-	}
-
-	pipe_desc.colors[0] = gfx.ColorState{
-		blend: gfx.BlendState{
-			enabled: true
-			src_factor_rgb: .src_alpha
-			dst_factor_rgb: .one_minus_src_alpha
+	{
+		mut pipe_desc := gfx.PipelineDesc{}
+		unsafe {
+			vmemset(&pipe_desc, 0, int(sizeof(pipe_desc)))
 		}
-	}
 
-	pipe_desc.depth = gfx.DepthState{
-		write_enabled: true
-		compare: .less_equal
-	}
+		pipe_desc.colors[0] = gfx.ColorState{
+			blend: gfx.BlendState{
+				enabled: true
+				src_factor_rgb: .src_alpha
+				dst_factor_rgb: .one_minus_src_alpha
+			}
+		}
 
-	// pipe_desc.cull_mode = .back
-	game.pipeline = sgl.make_pipeline(&pipe_desc)
+		pipe_desc.depth = gfx.DepthState{
+			write_enabled: true
+			compare: .less_equal
+		}
+
+		// pipe_desc.cull_mode = .back
+		game.pipeline = sgl.make_pipeline(&pipe_desc)
+	}
 
 	game.textures = textures.init()
-	game.block = new_block(.grass, 'block_grass', z: -5)
+	game.chunks << new_chunk(1)
+	blocks := game.chunks[0].blocks
+	println(blocks.len * blocks[0].len * blocks[0][0].len)
 	
 	// Camera does not update until mouse moves, so we want to do it
 	// manually the first time before the mouse gets a chance to move.

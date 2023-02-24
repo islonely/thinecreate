@@ -3,7 +3,7 @@ import sokol.sgl
 import transform { Vector3 }
 
 // sgl_draw_cube draws a cube to the scren using the sokol.sgl module.
-fn sgl_draw_cube(size int) {
+fn sgl_draw_cube(size f32) {
 	// vfmt off
 	sgl.begin_quads()
 	{

@@ -27,13 +27,13 @@ pub mut:
 
 // new_camera instantiates a Camera and returns it.
 [inline]
-fn new_camera(parent &Player, width int, height int, fov f32, pos Vector3) &Camera {
+fn new_camera(parent &Player, width int, height int, fov f32) &Camera {
 	return &Camera{
 		parent: parent
 		width: width
 		height: height
 		fov: fov
-		pos: pos
+		pos: parent.pos
 	}
 }
 
