@@ -1,7 +1,6 @@
 import math { cos, radians, sin }
 import sokol.sgl
-
-import transform { Vector3 }
+import src.transform { Vector3 }
 
 // Camera the lens you look through to see the 3D space.
 [heap]
@@ -10,14 +9,14 @@ pub mut:
 	world_up Vector3 = Vector3{
 		y: 1
 	}
-	pos Vector3
+	pos   Vector3
 	front Vector3
 
 	yaw   f32 = -90
 	pitch f32
 
-	width  int
-	height int
+	width      int
+	height     int
 	fov        f32 = 90.0
 	near_plane f32 = 0.1
 	far_plane  f32 = 100.0
@@ -65,10 +64,7 @@ fn (mut cam Camera) update() {
 	cam.perspective()
 	center := cam.pos + cam.front
 	// vmft off
-	sgl.lookat(
-		cam.pos.x, cam.pos.y, cam.pos.z,
-		center.x, center.y, center.z,
-		cam.world_up.x, cam.world_up.y, cam.world_up.z
-	)
+	sgl.lookat(cam.pos.x, cam.pos.y, cam.pos.z, center.x, center.y, center.z, cam.world_up.x,
+		cam.world_up.y, cam.world_up.z)
 	// vfmt on
 }

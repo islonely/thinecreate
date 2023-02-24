@@ -1,14 +1,13 @@
 import sokol.sgl
-
-import transform { Vector3 }
+import src.transform { Vector3 }
 
 // Block represents a block in the game.
 struct Block {
 pub:
-	typ  BlockType = .test
-	name string
-	invisible bool
-	collision bool = true
+	typ        BlockType = .test
+	name       string
+	invisible  bool
+	collision  bool = true
 	suffocates bool = true
 pub mut:
 	pos Vector3
@@ -16,8 +15,8 @@ pub mut:
 
 [params]
 struct BlockProperties {
-	invisible bool
-	collision bool = true
+	invisible  bool
+	collision  bool = true
 	suffocates bool = true
 }
 
@@ -67,13 +66,12 @@ fn (mut block Block) draw(mut game Game) {
 	sgl.disable_texture()
 }
 
-enum BlockType as int {
+enum BlockType {
 	air
 	dirt
 	glass
 	grass
 	stone
-
 	test
 	block_count
 }

@@ -3,8 +3,7 @@ module main
 import time
 import sokol.gfx
 import sokol.sgl
-
-import textures
+import src.textures
 
 fn main() {
 	mut game := new_game()
@@ -44,12 +43,11 @@ fn init(mut game Game) {
 		// pipe_desc.cull_mode = .back
 		game.pipeline = sgl.make_pipeline(&pipe_desc)
 	}
-
 	game.textures = textures.init()
 	game.chunks << new_chunk(1)
 	blocks := game.chunks[0].blocks
 	println(blocks.len * blocks[0].len * blocks[0][0].len)
-	
+
 	// Camera does not update until mouse moves, so we want to do it
 	// manually the first time before the mouse gets a chance to move.
 	mut cam := game.camera()

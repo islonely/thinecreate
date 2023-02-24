@@ -1,4 +1,4 @@
-import transform { Vector3 }
+import src.transform { Vector3 }
 
 // IMPORTANT NOTE: When more than 1811 blocks are drawn by a Chunk the entire screen turns
 // black. This is probably the most important thing to figure out. A voxel engine that can
@@ -6,7 +6,8 @@ import transform { Vector3 }
 // Whenever I add an additional gg.Context.draw_text somewhere in the code it reduces the
 // value even more. I've honestly got no idea what would cause this. This is the first 3D
 // programming I've ever done.
-const max_height = 1811
+const max_height = 1810
+
 const chunk_size = 16
 
 // Chunk is an area of X by X by max_height containing information about all the
@@ -14,7 +15,7 @@ const chunk_size = 16
 struct Chunk {
 	pos Vector3
 mut:
-	size int = chunk_size
+	size   int = chunk_size
 	height int = max_height
 	blocks [][][]&Block
 }
@@ -28,11 +29,11 @@ fn new_chunk(size int) &Chunk {
 
 	mut area := [][]&Block{}
 	mut row := []&Block{cap: chunk.height}
-	for y in 0..chunk.height {
+	for y in 0 .. chunk.height {
 		area = [][]&Block{}
-		for x in 0..chunk.size {
+		for x in 0 .. chunk.size {
 			row = []&Block{cap: chunk.height}
-			for z in 0..chunk.size {
+			for z in 0 .. chunk.size {
 				pos := Vector3{x, y, z}
 				row << if y > 60 {
 					new_block(.glass, 'block_glass', pos, suffocates: false)
@@ -57,9 +58,9 @@ fn new_chunk(size int) &Chunk {
 // draw draws each Block in the chunk to the screen
 [direct_array_access]
 fn (mut chunk Chunk) draw(mut game Game) {
-	for x in 0..chunk.size {
-		for y in 0..chunk.size {
-			for z in 0..chunk.height {
+	for x in 0 .. chunk.size {
+		for y in 0 .. chunk.size {
+			for z in 0 .. chunk.height {
 				chunk.blocks[z][x][y].draw(mut game)
 			}
 		}

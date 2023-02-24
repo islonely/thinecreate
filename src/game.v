@@ -1,12 +1,9 @@
 import arrays
 import gg
 import gx
-import math { sin, cos }
 import time
 import sokol.sgl
 import sokol.gfx
-
-import transform { Vector3 }
 
 const (
 	width       = 1920 // 1200
@@ -22,28 +19,28 @@ mut:
 	g        &gg.Context = unsafe { nil }
 	pipeline sgl.Pipeline
 
-	width        int   = width
-	half_width   int   = half_width
-	height       int   = height
-	half_height  int   = half_height
-	fps_queue    []f32 = []f32{len: 100}
+	width       int   = width
+	half_width  int   = half_width
+	height      int   = height
+	half_height int   = half_height
+	fps_queue   []f32 = []f32{len: 100}
 
 	delta_time   i64
 	last_time    i64 = time.now().unix_time_milli()
 	current_time i64
 
-	state GameState = .playing
+	state    GameState = .playing
 	settings Settings
 
 	key_is_down KeyDown
 
-	offsetx			  f32
-	offsety			  f32
-	lastx 			  f32
-	lasty			  f32
+	offsetx f32
+	offsety f32
+	lastx   f32
+	lasty   f32
 
 	player &Player
-	chunks  []&Chunk
+	chunks []&Chunk
 
 	textures map[string][]gfx.Image
 }
@@ -119,7 +116,7 @@ fn (mut game Game) update_playing() {
 fn (mut game Game) draw() {
 	game.g.begin()
 
-	{	// allows us to draw in 3D space without interfering
+	{ // allows us to draw in 3D space without interfering
 		// with the 2D draw functions.
 		sgl.viewport(0, 0, game.width, game.height, true)
 		sgl.matrix_mode_projection()
@@ -128,13 +125,12 @@ fn (mut game Game) draw() {
 		sgl.matrix_mode_modelview()
 		sgl.load_identity()
 	}
-
 	game.draw_skybox()
 	for mut chunk in game.chunks {
 		chunk.draw(mut game)
 	}
-	
-	{	// allows us to write and draw in 2D space without distorting
+
+	{ // allows us to write and draw in 2D space without distorting
 		// text and shapes with the 3D view.
 		sgl.matrix_mode_projection()
 		sgl.load_identity()
@@ -142,7 +138,6 @@ fn (mut game Game) draw() {
 		sgl.matrix_mode_modelview()
 		sgl.load_identity()
 	}
-
 	game.draw_ui()
 	game.draw_debug()
 
@@ -167,8 +162,7 @@ fn (mut game Game) draw_debug() {
 	size := 24
 	bg := gx.hex(0x00000033)
 
-	
-	game.g.draw_rect_filled(7, 5, 300, 24*3+6, bg)
+	game.g.draw_rect_filled(7, 5, 300, 24 * 3 + 6, bg)
 
 	fps := 'FPS: ${game.fps()}'
 	game.g.draw_text(10, (row * size + padding), fps,
@@ -200,7 +194,8 @@ fn (mut game Game) aspect_ratio() f32 {
 // perspective
 [inline]
 fn (mut game Game) perspective() {
-	sgl.perspective(sgl.rad(game.camera().fov), game.aspect_ratio(), game.camera().near_plane, game.camera().far_plane)
+	sgl.perspective(sgl.rad(game.camera().fov), game.aspect_ratio(), game.camera().near_plane,
+		game.camera().far_plane)
 }
 
 // camera returns a reference to the current Camera being used.
@@ -219,23 +214,20 @@ fn (mut game Game) draw_skybox() {
 	sgl.push_matrix()
 
 	sgl.matrix_mode_projection()
-	
+
 	// We need custom lookat here so the skybox doesn't move towards or away
 	// from the Player, but still rotates.
 	mut cam := game.camera()
 	cam.perspective()
 	// vmft off
-	sgl.lookat(
-		0, 0, 0,
-		cam.front.x, cam.front.y, cam.front.z,
-		cam.world_up.x, cam.world_up.y, cam.world_up.z
-	)
+	sgl.lookat(0, 0, 0, cam.front.x, cam.front.y, cam.front.z, cam.world_up.x, cam.world_up.y,
+		cam.world_up.z)
 	// vfmt on
 
 	sgl.matrix_mode_modelview()
 	sgl_draw_cube(32)
 	sgl.end()
-	
+
 	sgl.pop_matrix()
 	sgl.disable_texture()
 }

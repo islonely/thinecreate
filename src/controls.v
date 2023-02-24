@@ -23,7 +23,7 @@ fn handle_mouse_move(x f32, y f32, mut game Game) {
 		}
 
 		if new_pitch > 89 {
-			cam.pitch = 89	
+			cam.pitch = 89
 		} else if new_pitch < -89 {
 			cam.pitch = -89
 		} else {
@@ -31,7 +31,7 @@ fn handle_mouse_move(x f32, y f32, mut game Game) {
 		}
 		cam.on_mouse_move()
 
-		{	// wraps mouse to other side of window if it passes
+		{ // wraps mouse to other side of window if it passes
 			// a certain threshold.
 			// TODO: this ^
 		}

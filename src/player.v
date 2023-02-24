@@ -1,18 +1,18 @@
-import transform { Vector3 }
+import src.transform { Vector3 }
 
 // Player represents the player.
 [heap]
 struct Player {
 mut:
-	cameras              []&Camera = []&Camera{cap: 3}
-	curr_cam             int
-	pos                  Vector3 = Vector3{
+	cameras  []&Camera = []&Camera{cap: 3}
+	curr_cam int
+	pos      Vector3 = Vector3{
 		y: 60
 		z: -2
 	}
-	run_mult            f32 = 1.4
-	sneak_mult          f32 = 0.5
-	base_speed  		f32 = 0.01
+	run_mult   f32 = 1.4
+	sneak_mult f32 = 0.5
+	base_speed f32 = 0.01
 }
 
 // toggle_camera sets the current camera to the next Camera in
