@@ -4,7 +4,10 @@ import sokol.gfx
 import stbi
 
 // byte data from the texture source files.
-const (
+pub const (
+	mainmenu_background_bytes = $embed_file('src/img/mainmenu_background.jpg').to_bytes()
+	logo_bytes = $embed_file('src/img/logo.png').to_bytes()
+
 	block_dirt_bytes  = $embed_file('src/img/block_dirt.png').to_bytes()
 	block_glass_bytes = $embed_file('src/img/block_glass.png').to_bytes()
 	block_grass_bytes = $embed_file('src/img/block_grass.png').to_bytes()
