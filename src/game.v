@@ -144,7 +144,8 @@ fn init(mut game Game) {
 			},
 			MenuItem{
 				label: 'Multiplayer'
-				on_selected: fn () {}
+				clickable: false
+				disabled: true
 			},
 			MenuItem{
 				label: 'Settings'
@@ -158,6 +159,59 @@ fn init(mut game Game) {
 					game.g.quit()
 				}
 			},
+		]
+	}
+	game.settings.menu.Menu = Menu{
+		step: false
+		pos: Vector2{100, 100}
+		text_size: 30
+		italic: false
+		items: [
+			MenuItem{
+				clickable: false
+				disabled: true
+				label: 'Resolution: ${game.width}x${game.height}'
+				// TODO: Add ability to change resolution.
+			},
+			MenuItem{
+				label: 'Fullscreen: disabled'
+				on_selected: fn [mut game] () {
+					game.settings.menu.items[1].label = if gg.is_fullscreen() {
+						'Fullscreen: disabled'
+					} else {
+						'Fullscreen: enabled'
+					}
+					gg.toggle_fullscreen()
+				}
+			},
+			MenuItem{
+				label: 'Invert Y Axis: false'
+				on_selected: fn [mut game] () {
+					game.settings.menu.items[2].label = if game.settings.invert_y_axis == -1 {
+						'Invert Y Axis: true'
+					} else {
+						'Invert Y Axis: false'
+					}
+					game.settings.invert_y_axis *= -1
+				}
+			},
+			MenuItem{
+				label: 'Debug Overlay: true'
+				on_selected: fn [mut game] () {
+					game.settings.menu.items[3].label = if game.settings.debug {
+						'Debug Overlay: false'
+					} else {
+						'Debug Overlay: true'
+					}
+					game.settings.debug = !game.settings.debug
+				}
+			},
+			MenuItem{
+				label: 'Back'
+				on_selected: fn [mut game] () {
+					game.state = .mainmenu
+				}
+			}
 		]
 	}
 
@@ -199,7 +253,7 @@ fn (mut game Game) update() {
 		.mainmenu { game.mainmenu.update(game.key_is_down, mut game) }
 		.paused {}
 		.playing { game.update_playing() }
-		.settings {}
+		.settings { game.settings.menu.update(game.key_is_down, mut game) }
 	}
 }
 
@@ -228,14 +282,21 @@ fn (mut game Game) draw() {
 
 			game.init_2d()
 			game.draw_playing_ui()
-			game.draw_debug()
+
+			if game.settings.debug {
+				game.draw_debug()
+			}
 		}
-		.settings {}
+		.settings {
+			game.init_2d()
+			game.settings.draw(mut game)
+		}
 	}
 }
 
 // draw_playing_ui draws the user interface to the screen
 fn (mut game Game) draw_playing_ui() {
+	// TODO: switch to draw_filled_rect so we can adjust the line thickness
 	{ // draw reticle
 		reticle_size := 12
 		reticle_color := gx.black
