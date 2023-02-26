@@ -342,24 +342,25 @@ fn (mut game Game) draw_debug() {
 	size := 24
 	bg := gx.hex(0x00000033)
 
-	game.g.draw_rect_filled(7, 5, 300, 24 * 3 + 6, bg)
-
 	fps := 'FPS: ${game.fps()}'
-	game.g.draw_text(10, (row * size + padding), fps,
-		size: size
-		color: gx.white
-	)
-
-	row++
 	pos := 'Position: X: ${int(game.player.pos.x)}, Y: ${int(game.player.pos.y)}, Z: ${int(game.player.pos.z)}'
-	game.g.draw_text(10, (row * size + padding), pos,
+	facing := 'Facing: ${game.player.facing().str().trim_left('.')}'
+	w, mut h := game.g.text_size(pos)
+	h *= 3
+	h += 3 * padding
+
+	game.g.draw_rounded_rect_filled(15-padding, 15-padding, w+padding*2, h, 5.0, bg)
+	game.g.draw_text(15, (row * size + padding), fps,
 		size: size
 		color: gx.white
 	)
-
-	facing := 'Facing: ${game.player.facing().str().trim_left('.')}'
 	row++
-	game.g.draw_text(10, (row * size + padding), facing,
+	game.g.draw_text(15, (row * size + padding), pos,
+		size: size
+		color: gx.white
+	)
+	row++
+	game.g.draw_text(15, (row * size + padding), facing,
 		size: size
 		color: gx.white
 	)

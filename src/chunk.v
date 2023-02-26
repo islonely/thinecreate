@@ -6,7 +6,7 @@ import src.transform { Vector3 }
 // Whenever I add an additional gg.Context.draw_text somewhere in the code it reduces the
 // value even more. I've honestly got no idea what would cause this. This is the first 3D
 // programming I've ever done.
-const max_height = 1810
+const max_height = 1800
 
 const chunk_size = 16
 
