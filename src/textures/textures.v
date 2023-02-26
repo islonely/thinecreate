@@ -6,15 +6,15 @@ import stbi
 // byte data from the texture source files.
 pub const (
 	mainmenu_background_bytes = $embed_file('src/img/mainmenu_background.jpg').to_bytes()
-	logo_bytes = $embed_file('src/img/logo.png').to_bytes()
+	logo_bytes                = $embed_file('src/img/logo.png').to_bytes()
 
-	block_dirt_bytes  = $embed_file('src/img/block_dirt.png').to_bytes()
-	block_glass_bytes = $embed_file('src/img/block_glass.png').to_bytes()
-	block_grass_bytes = $embed_file('src/img/block_grass.png').to_bytes()
-	block_stone_bytes = $embed_file('src/img/block_stone.png').to_bytes()
-	block_test_bytes  = $embed_file('src/img/block_test.png').to_bytes()
+	block_dirt_bytes          = $embed_file('src/img/block_dirt.png').to_bytes()
+	block_glass_bytes         = $embed_file('src/img/block_glass.png').to_bytes()
+	block_grass_bytes         = $embed_file('src/img/block_grass.png').to_bytes()
+	block_stone_bytes         = $embed_file('src/img/block_stone.png').to_bytes()
+	block_test_bytes          = $embed_file('src/img/block_test.png').to_bytes()
 
-	misc_skybox_bytes = $embed_file('src/img/skybox.png').to_bytes()
+	misc_skybox_bytes         = $embed_file('src/img/skybox.png').to_bytes()
 )
 
 // init returns a map of all the textures. Sokol doesn't like it if you

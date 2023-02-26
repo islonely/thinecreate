@@ -4,14 +4,13 @@ import gx
 import time
 import sokol.sgl
 import sokol.gfx
-
 import src.textures
 import src.transform { Vector2 }
 
 const (
-	width       = 1920 // 1200
+	width       = 1920
 	half_width  = width / 2
-	height      = 1080 // 860
+	height      = 1080
 	half_height = height / 2
 )
 
@@ -47,9 +46,9 @@ mut:
 
 	textures map[string][]gfx.Image
 
-	mainmenu MainMenu
+	mainmenu        MainMenu
 	menu_background gg.Image
-	logo gg.Image
+	logo            gg.Image
 }
 
 type KeyDown = map[gg.KeyCode]bool
@@ -134,7 +133,7 @@ fn init(mut game Game) {
 	game.mainmenu = MainMenu{
 		pos: Vector2{
 			x: 190
-			y: int(game.height/dpi_scale(mut game) - 230)
+			y: int(game.height / dpi_scale(mut game) - 230)
 		}
 		items: [
 			MenuItem{
@@ -158,7 +157,7 @@ fn init(mut game Game) {
 				on_selected: fn [mut game] () {
 					game.g.quit()
 				}
-			}
+			},
 		]
 	}
 
@@ -182,7 +181,7 @@ fn (mut game Game) resize() {
 		cam.width = new_size.width
 		cam.height = new_size.height
 	}
-	game.width =  int(new_size.width)
+	game.width = int(new_size.width)
 	game.height = int(new_size.height)
 	game.half_width = game.width / 2
 	game.half_height = game.height / 2
@@ -226,7 +225,7 @@ fn (mut game Game) draw() {
 			for mut chunk in game.chunks {
 				chunk.draw(mut game)
 			}
-			
+
 			game.init_2d()
 			game.draw_playing_ui()
 			game.draw_debug()

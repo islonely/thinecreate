@@ -61,6 +61,5 @@ fn handle_resize(evt &gg.Event, mut game Game) {
 	game.resize()
 
 	// main menu
-	game.mainmenu.pos.y = int(game.height/dpi_scale(mut game) - 230)
-	
+	game.mainmenu.pos.y = int(game.height / dpi_scale(mut game) - 230)
 }
