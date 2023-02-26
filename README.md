@@ -6,6 +6,5 @@ as Minecraft, but at the same time does not include all the occultish and demoni
 Minecraft. Such as enchanting, potions and witches, the nether or hell among other things.
 
 ### TODO
-- [ ] Screenshot with gg.record_frame
 - [ ] Disallow mouse from moving out of window
 - [ ] Fix note at chunk.v:3

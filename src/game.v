@@ -1,7 +1,9 @@
 import arrays
 import gg
 import gx
+import os
 import time
+import sokol.sapp
 import sokol.sgl
 import sokol.gfx
 import src.textures
@@ -49,6 +51,8 @@ mut:
 	mainmenu        MainMenu
 	menu_background gg.Image
 	logo            gg.Image
+
+	screenshot_path string = './screenshots'
 }
 
 type KeyDown = map[gg.KeyCode]bool
@@ -241,6 +245,25 @@ fn (mut game Game) resize() {
 	game.half_height = game.height / 2
 }
 
+// export_screenshot saves a screenshot of the game to the system.
+fn (mut game Game) export_screenshot() {
+	if !os.exists(game.screenshot_path) {
+		os.mkdir(game.screenshot_path) or {
+			println('Failed to create screenshot directory.')
+			return
+		}
+	}
+
+	filename := time.now().custom_format('YYYY-MM-DD hh:mm:ss') + '.png'
+	path := game.screenshot_path + os.path_separator + filename
+	sapp.screenshot(path) or {
+		println('Failed to save screenshot.')
+		return
+	}
+
+	println('Screenshot saved to ${path}.')
+}
+
 // update updates the game according to what GameState it's currently in.
 fn (mut game Game) update() {
 	game.fps_queue.delete(0)
@@ -260,6 +283,11 @@ fn (mut game Game) update() {
 // update_playing updates the game while in GameState.playing.
 fn (mut game Game) update_playing() {
 	game.player.on_key_down(game.key_is_down, f32(game.delta_time))
+
+	if game.key_is_down[.f3] {
+		game.export_screenshot()
+		game.key_is_down[.f3] = false
+	}
 }
 
 // draw updates the buffered image and draws it to the screen.
