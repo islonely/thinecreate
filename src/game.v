@@ -80,7 +80,7 @@ fn new_game() &Game {
 		window_title: 'ThineDesign'
 		width: game.width
 		height: game.height
-		font_bytes_mono: $embed_file('fonts/maple_mono/fonts/MapleMono-Regular.ttf').to_bytes()
+		font_bytes_normal: $embed_file('fonts/maple_mono/fonts/MapleMono-Regular.ttf').to_bytes()
 	)
 	game.player.cameras << new_camera(game.player, game.width, game.height, game.settings.fov)
 	return game

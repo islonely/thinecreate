@@ -100,3 +100,17 @@ pub fn (vec Vector2) vec3() Vector3 {
 		y: vec.y
 	}
 }
+
+[inline]
+pub fn (a Vector2) < (b Vector2) bool {
+	return if (a.x < b.x) || (a.y < b.y) {
+		true
+	} else {
+		false
+	}
+}
+
+[inline]
+pub fn (a Vector2) + (b Vector2) Vector2 {
+	return Vector2{(a.x + b.x), (a.y + b.y)}
+}
