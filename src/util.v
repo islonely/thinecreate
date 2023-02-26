@@ -1,3 +1,4 @@
+import gg
 import sokol.sgl
 
 // sgl_draw_cube draws a cube to the scren using the sokol.sgl module.
@@ -38,4 +39,34 @@ fn sgl_draw_cube(size f32) {
 		sgl.v3f_t2f( size, size, -size,		0.5,  0.0)
 	}
 	// vfmt on
+}
+
+// dpi_scale returns the appropriate scale for Android.
+[inline]
+fn dpi_scale(mut game Game) f32 {
+	return $if android {
+		game.g.scale
+	} $else {
+		gg.dpi_scale()
+	}
+}
+
+// window_size returns the appropriate size for Android.
+[inline]
+fn window_size(mut game Game) gg.Size {
+	return $if android {
+		game.g.window_size()
+	} $else {
+		gg.window_size()
+	}
+}
+
+// real_window_size returns the real appropriate size for Android.
+[inline]
+fn real_window_size(mut game Game) gg.Size {
+	return $if android {
+		game.g.window_size()
+	} $else {
+		gg.window_size_real_pixels()
+	}
 }

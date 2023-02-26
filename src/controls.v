@@ -55,3 +55,12 @@ fn handle_key_up(key gg.KeyCode, mod gg.Modifier, mut game Game) {
 fn handle_unfocus(evt &gg.Event, mut game Game) {
 	game.key_is_down = map[gg.KeyCode]bool{}
 }
+
+// handle_resize
+fn handle_resize(evt &gg.Event, mut game Game) {
+	game.resize()
+
+	// main menu
+	game.mainmenu.pos.y = int(game.height/dpi_scale(mut game) - 230)
+	
+}

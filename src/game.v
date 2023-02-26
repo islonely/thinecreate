@@ -6,6 +6,7 @@ import sokol.sgl
 import sokol.gfx
 
 import src.textures
+import src.transform { Vector2 }
 
 const (
 	width       = 1920 // 1200
@@ -77,10 +78,14 @@ fn new_game() &Game {
 		keydown_fn: handle_key_down
 		keyup_fn: handle_key_up
 		leave_fn: handle_unfocus
+		resized_fn: handle_resize
 		window_title: 'ThineDesign'
 		width: game.width
 		height: game.height
 		font_bytes_normal: $embed_file('fonts/maple_mono/fonts/MapleMono-Regular.ttf').to_bytes()
+		font_bytes_bold: $embed_file('fonts/maple_mono/fonts/MapleMono-Bold.ttf').to_bytes()
+		font_bytes_italic: $embed_file('fonts/maple_mono/fonts/MapleMono-Italic.ttf').to_bytes()
+		font_bytes_mono: $embed_file('fonts/maple_mono/fonts/MapleMono-Regular.ttf').to_bytes()
 	)
 	game.player.cameras << new_camera(game.player, game.width, game.height, game.settings.fov)
 	return game
@@ -121,14 +126,16 @@ fn init(mut game Game) {
 
 	// Camera does not update until mouse moves, so we want to do it
 	// manually the first time before the mouse gets a chance to move.
-	// mut cam := game.camera()
-	// cam.on_mouse_move()
+	mut cam := game.camera()
+	cam.on_mouse_move()
 
 	game.menu_background = game.g.create_image_from_byte_array(textures.mainmenu_background_bytes)
 	game.logo = game.g.create_image_from_byte_array(textures.logo_bytes)
 	game.mainmenu = MainMenu{
-		x: 210
-		y: int(game.height/gg.dpi_scale() - 250)
+		pos: Vector2{
+			x: 190
+			y: int(game.height/dpi_scale(mut game) - 230)
+		}
 		items: [
 			MenuItem{
 				label: 'Singleplayer'
@@ -166,6 +173,19 @@ fn (game Game) fps() int {
 		return -1
 	}
 	return int(sum) / game.fps_queue.len
+}
+
+// resize refreshes the width and height of the Game and Cameras.
+fn (mut game Game) resize() {
+	new_size := real_window_size(mut game)
+	for mut cam in game.player.cameras {
+		cam.width = new_size.width
+		cam.height = new_size.height
+	}
+	game.width =  int(new_size.width)
+	game.height = int(new_size.height)
+	game.half_width = game.width / 2
+	game.half_height = game.height / 2
 }
 
 // update updates the game according to what GameState it's currently in.
@@ -220,8 +240,8 @@ fn (mut game Game) draw_playing_ui() {
 	{ // draw reticle
 		reticle_size := 12
 		reticle_color := gx.black
-		x := game.half_width / gg.dpi_scale()
-		y := game.half_height / gg.dpi_scale()
+		x := game.half_width / dpi_scale(mut game)
+		y := game.half_height / dpi_scale(mut game)
 		game.g.draw_line(x, (y - reticle_size), x, (y + reticle_size), reticle_color)
 		game.g.draw_line((x - reticle_size), y, (x + reticle_size), y, reticle_color)
 	}

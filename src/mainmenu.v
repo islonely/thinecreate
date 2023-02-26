@@ -1,4 +1,3 @@
-import gg
 import gx
 
 import src.transform { Vector2 }
@@ -7,12 +6,11 @@ import src.transform { Vector2 }
 [heap]
 struct MainMenu {
 mut:
-	x int
-	y int
+	pos Vector2
 	text_size int = 44
 	text_shadow bool = true
 	text_color gx.Color = gx.white
-	padding int = 15
+	padding int = 8
 	step bool = true
 	step_size int = 35
 	step_dir StepDirection = .left
@@ -32,13 +30,14 @@ struct MenuItem {
 	label string = '<label_not_set>'
 }
 
-// StepDirection
+// StepDirection is the directions the list items can be
+// stepped downwards.
 enum StepDirection {
 	left
 	right
 }
 
-// update updates the menu.
+// update handles key presses on the MainMenu among other things.
 fn (mut menu MainMenu) update(keydown KeyDown, mut game Game) {
 	if keydown[.enter] {
 		menu.items[menu.selected].on_selected()
@@ -68,25 +67,26 @@ fn (mut menu MainMenu) update(keydown KeyDown, mut game Game) {
 
 // draw draws the MainMenu to the screen.
 fn (mut menu MainMenu) draw(mut game Game) {
-	game.g.draw_image(0, 0, (game.width/gg.dpi_scale()), (game.height/gg.dpi_scale()), game.menu_background)
+	game.g.draw_image(0, 0, (game.width/dpi_scale(mut game)), (game.height/dpi_scale(mut game)), game.menu_background)
+
 	logo_scale := f32(0.33)
 	logo_scaled_width := f32(game.logo.width) * logo_scale
 	logo_scaled_height := f32(game.logo.height) * logo_scale
-	logo_x := game.width/gg.dpi_scale()/2 - logo_scaled_width/2
-	game.g.draw_image(logo_x, 50, logo_scaled_width, logo_scaled_height, game.logo)
+	logo_x := game.width/dpi_scale(mut game)/2 - logo_scaled_width/2
+	game.g.draw_image(logo_x, 100, logo_scaled_width, logo_scaled_height, game.logo)
 
 	for i, item in menu.items {
 		step := (i * menu.step_size)
 		x := if menu.step {
-			menu.x + if menu.step_dir == .right {
+			menu.pos.x + if menu.step_dir == .right {
 				step
 			} else {
 				-step
 			}
 		} else {
-			menu.x
+			menu.pos.x
 		}
-		y := menu.y + (i * menu.text_size + menu.padding)
+		y := menu.pos.y + (i * menu.text_size + i * menu.padding)
 
 		mut color := menu.text_color
 		if i == menu.selected {
@@ -100,7 +100,7 @@ fn (mut menu MainMenu) draw(mut game Game) {
 			game.g.draw_rounded_rect_filled(menu.selector_pos.x, menu.selector_pos.y, w, 2.5, 500, color)
 		}
 
-		game.g.draw_text(x, y, item.label,
+		game.g.draw_text(int(x), int(y), item.label,
 			size: menu.text_size
 			vertical_align: .middle
 			align: if menu.step_dir == .right {
@@ -108,7 +108,7 @@ fn (mut menu MainMenu) draw(mut game Game) {
 			} else {
 				.left
 			}
-			mono: true
+			italic: true
 			color: color
 		)
 	}
