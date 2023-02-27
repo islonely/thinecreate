@@ -7,7 +7,7 @@ import sokol.sapp
 import sokol.sgl
 import sokol.gfx
 import src.textures
-import src.transform { Vector2 }
+import src.transform { Vector2, Vector3 }
 
 const (
 	width       = 1920
