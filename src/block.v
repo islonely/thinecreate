@@ -6,11 +6,12 @@ struct Block {
 pub:
 	typ        BlockType = .test
 	name       string
+pub mut:
+	pos Vector3
 	invisible  bool
 	collision  bool = true
 	suffocates bool = true
-pub mut:
-	pos Vector3
+	is_active  bool = true
 }
 
 [params]
@@ -66,11 +67,16 @@ fn (mut block Block) draw(mut game Game) {
 	sgl.disable_texture()
 }
 
+// BlockType is every different type of block available.
 enum BlockType {
 	air
 	dirt
+	dust
 	glass
 	grass
+	juniper
+	redwood
+	slate
 	stone
 	test
 	block_count

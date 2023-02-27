@@ -65,8 +65,11 @@ fn handle_resize(evt &gg.Event, mut game Game) {
 // handle_leave controls what happens when the mouse pointer leaves
 // the area of the window.
 fn handle_leave(evt &gg.Event, mut game Game) {
-	screen_size := mouse.screen_size()
-	center_x, center_y := screen_size.width/2, screen_size.height/2
-	game.lastx, game.lasty = center_x, center_y
-	mouse.set_pos(center_x, center_y)
+	// don't let the mouse leave the window if the game is being played.
+	if game.state == .playing {
+		screen_size := mouse.screen_size()
+		center_x, center_y := screen_size.width/2, screen_size.height/2
+		game.lastx, game.lasty = center_x, center_y
+		mouse.set_pos(center_x, center_y)
+	}
 }

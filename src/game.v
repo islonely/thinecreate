@@ -123,9 +123,7 @@ fn init(mut game Game) {
 		game.pipeline = sgl.make_pipeline(&pipe_desc)
 	}
 	game.textures = textures.init()
-	game.chunks << new_chunk(1)
-	blocks := game.chunks[0].blocks
-	println(blocks.len * blocks[0].len * blocks[0][0].len)
+	game.chunks << new_chunk(1, Vector3{})
 
 	// Camera does not update until mouse moves, so we want to do it
 	// manually the first time before the mouse gets a chance to move.

@@ -6,7 +6,7 @@ import src.transform { Vector3 }
 // Whenever I add an additional gg.Context.draw_text somewhere in the code it reduces the
 // value even more. I've honestly got no idea what would cause this. This is the first 3D
 // programming I've ever done.
-const max_height = 1800
+const max_height = 128
 
 const chunk_size = 16
 
@@ -22,9 +22,10 @@ mut:
 
 // new_chunk creates a Chunk with the specified size.
 [direct_array_access]
-fn new_chunk(size int) &Chunk {
+fn new_chunk(size int, p Vector3) &Chunk {
 	mut chunk := &Chunk{
 		size: size
+		pos: p
 	}
 
 	mut area := [][]&Block{}
@@ -34,9 +35,9 @@ fn new_chunk(size int) &Chunk {
 		for x in 0 .. chunk.size {
 			row = []&Block{cap: chunk.height}
 			for z in 0 .. chunk.size {
-				pos := Vector3{x, y, z}
+				pos := Vector3{x, y, z} + chunk.pos
 				row << if y > 60 {
-					new_block(.glass, 'block_glass', pos, suffocates: false)
+					new_block(.juniper, 'block_juniper', pos, suffocates: true)
 				} else if y > 59 {
 					new_block(.grass, 'block_grass', pos, BlockProperties{})
 				} else if y > 50 {

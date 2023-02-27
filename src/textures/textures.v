@@ -9,8 +9,12 @@ pub const (
 	logo_bytes                = $embed_file('src/img/logo.png').to_bytes()
 
 	block_dirt_bytes          = $embed_file('src/img/block_dirt.png').to_bytes()
+	block_dust_bytes          = $embed_file('src/img/block_dust.png').to_bytes()
 	block_glass_bytes         = $embed_file('src/img/block_glass.png').to_bytes()
 	block_grass_bytes         = $embed_file('src/img/block_grass.png').to_bytes()
+	block_juniper_bytes       = $embed_file('src/img/block_juniper.png').to_bytes()
+	block_redwood_bytes       = $embed_file('src/img/block_redwood.png').to_bytes()
+	block_slate_bytes         = $embed_file('src/img/block_slate.png').to_bytes()
 	block_stone_bytes         = $embed_file('src/img/block_stone.png').to_bytes()
 	block_test_bytes          = $embed_file('src/img/block_test.png').to_bytes()
 
@@ -28,8 +32,12 @@ pub fn init() map[string][]gfx.Image {
 			// But it won't get rendered because the block is invisible.
 			bytes_to_gfximage(textures.block_test_bytes, 'block_air'),
 			bytes_to_gfximage(textures.block_dirt_bytes, 'block_dirt'),
+			bytes_to_gfximage(textures.block_dust_bytes, 'block_dust'),
 			bytes_to_gfximage(textures.block_glass_bytes, 'block_glass'),
 			bytes_to_gfximage(textures.block_grass_bytes, 'block_grass'),
+			bytes_to_gfximage(textures.block_juniper_bytes, 'block_juniper'),
+			bytes_to_gfximage(textures.block_redwood_bytes, 'block_redwood'),
+			bytes_to_gfximage(textures.block_slate_bytes, 'block_slate'),
 			bytes_to_gfximage(textures.block_stone_bytes, 'block_stone'),
 			bytes_to_gfximage(textures.block_test_bytes, 'block_test'),
 		]
