@@ -1,15 +1,18 @@
 import gg
+import mouse
 import sokol.sapp
 
 // handle_mouse_move handles all mouse movements in game.
-fn handle_mouse_move(x f32, y f32, mut game Game) {
-	if game.state == .playing {
-		// sapp.show_mouse(false)
+fn handle_mouse_move(window_x f32, window_y f32, mut game Game) {
+	global_x, global_y := mouse.get_pos()
 
-		game.offsetx = (game.g.mouse_pos_x - game.lastx) * f32(game.delta_time) * game.settings.mouse_sensitivity
+	if game.state == .playing {
+		sapp.show_mouse(false)
+
+		game.offsetx = (global_x - game.lastx) * f32(game.delta_time) * game.settings.mouse_sensitivity / 10
 		// Y coords go from bottom to top, so we must reverse
-		game.offsety = (game.lasty - game.g.mouse_pos_y) * f32(game.delta_time) * game.settings.mouse_sensitivity * -game.settings.invert_y_axis
-		game.lastx, game.lasty = x, y
+		game.offsety = (game.lasty - global_y) * f32(game.delta_time) * game.settings.mouse_sensitivity / 10 * -game.settings.invert_y_axis
+		game.lastx, game.lasty = global_x, global_y
 
 		mut cam := game.player.camera()
 		new_yaw := cam.yaw + game.offsetx
@@ -49,16 +52,21 @@ fn handle_key_up(key gg.KeyCode, mod gg.Modifier, mut game Game) {
 	game.key_is_down[key] = false
 }
 
-// NOTE: this does not seem to activate on unfocus like it's suppose to.
-// Might just be a Windows thing. I have yet to test on another machine.
-fn handle_unfocus(evt &gg.Event, mut game Game) {
-	game.key_is_down = map[gg.KeyCode]bool{}
-}
-
-// handle_resize
+// handle_resize adjusts how the game is rendered when the window size
+// changes.
 fn handle_resize(evt &gg.Event, mut game Game) {
 	game.resize()
 
 	// main menu
 	game.mainmenu.pos.y = int(game.height / dpi_scale(mut game) - 230)
+}
+
+
+// handle_leave controls what happens when the mouse pointer leaves
+// the area of the window.
+fn handle_leave(evt &gg.Event, mut game Game) {
+	screen_size := mouse.screen_size()
+	center_x, center_y := screen_size.width/2, screen_size.height/2
+	game.lastx, game.lasty = center_x, center_y
+	mouse.set_pos(center_x, center_y)
 }

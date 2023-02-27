@@ -80,8 +80,8 @@ fn new_game() &Game {
 		move_fn: handle_mouse_move
 		keydown_fn: handle_key_down
 		keyup_fn: handle_key_up
-		leave_fn: handle_unfocus
 		resized_fn: handle_resize
+		leave_fn: handle_leave
 		window_title: 'ThineDesign'
 		width: game.width
 		height: game.height
@@ -132,6 +132,7 @@ fn init(mut game Game) {
 	mut cam := game.camera()
 	cam.on_mouse_move()
 
+	// main menu
 	game.menu_background = game.g.create_image_from_byte_array(textures.mainmenu_background_bytes)
 	game.logo = game.g.create_image_from_byte_array(textures.logo_bytes)
 	game.mainmenu = MainMenu{
@@ -164,6 +165,11 @@ fn init(mut game Game) {
 				}
 			},
 		]
+	}
+	
+	// settings menu
+	$if debug {
+		game.settings.debug = true
 	}
 	game.settings.menu.Menu = Menu{
 		step: false

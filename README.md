@@ -6,5 +6,10 @@ as Minecraft, but at the same time does not include all the occultish and demoni
 Minecraft. Such as enchanting, potions and witches, the nether or hell among other things.
 
 ### TODO
-- [ ] Disallow mouse from moving out of window
-- [ ] Fix note at chunk.v:3
+In no particular order:
+- Fix note at chunk.v:3
+- Infinite worlds
+- HUD
+- Inventory
+- Make it so a headless server can be run
+- Multiplayer

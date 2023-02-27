@@ -11,9 +11,9 @@ struct Settings {
 mut:
 	menu SettingsMenu
 
-	debug bool = true
+	debug bool
 
-	mouse_sensitivity f32 = 0.05
+	mouse_sensitivity f32 = 0.5
 	invert_y_axis     int = -1 // -1 = false, 1 = true
 
 	fov f32 = 90.0
