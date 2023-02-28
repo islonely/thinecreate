@@ -1,8 +1,8 @@
 import gg
 import sokol.sgl
 
-const third = f32(1) / f32(3)
-const third2 = f32(2) / f32(3)
+const third = f32(0.3333333)
+const third2 = f32(0.6666666)
 
 fn sgl_draw_cube(size f32) {
 	// vfmt off

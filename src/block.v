@@ -1,5 +1,55 @@
 import sokol.sgl
-import src.transform { Vector3 }
+import src.transform { Vector3, Vertex }
+
+const (
+	block_size = f32(0.5)
+)
+
+// vfmt off
+const (
+	block_vertices = [
+		//          X            Y            Z        U      V
+		// back face
+		Vertex{-block_size,  block_size, -block_size, 1.0,  third}
+		Vertex{ block_size,  block_size, -block_size, 0.75, third}
+		Vertex{ block_size, -block_size, -block_size, 0.75, third2}
+		Vertex{-block_size, -block_size, -block_size, 1.0,  third2}
+		// front face
+		Vertex{-block_size, -block_size,  block_size, 0.25, third2}
+		Vertex{ block_size, -block_size,  block_size, 0.5,  third2}
+		Vertex{ block_size,  block_size,  block_size, 0.5,  third}
+		Vertex{-block_size,  block_size,  block_size, 0.25, third}
+		// left face
+		Vertex{-block_size,  block_size,  block_size, 0.25, third}
+		Vertex{-block_size,  block_size, -block_size, 0.0,  third}
+		Vertex{-block_size, -block_size, -block_size, 0.0,  third2}
+		Vertex{-block_size, -block_size,  block_size, 0.25, third2}
+		// right face
+		Vertex{ block_size, -block_size,  block_size, 0.5,  third2}
+		Vertex{ block_size, -block_size, -block_size, 0.75, third2}
+		Vertex{ block_size,  block_size, -block_size, 0.75, third}
+		Vertex{ block_size,  block_size,  block_size, 0.5,  third}
+		// bottom face
+		Vertex{ block_size, -block_size, -block_size, 0.5,  1.0}
+		Vertex{ block_size, -block_size,  block_size, 0.5,  third2}
+		Vertex{-block_size, -block_size,  block_size, 0.25, third2}
+		Vertex{-block_size, -block_size, -block_size, 0.25, 1.0}
+		// top face
+		Vertex{-block_size,  block_size, -block_size, 0.25,  0.0}
+		Vertex{-block_size,  block_size,  block_size, 0.25,  third}
+		Vertex{ block_size,  block_size,  block_size, 0.5,   third}
+		Vertex{ block_size,  block_size, -block_size, 0.5,   0.0}
+	]
+	block_indices = [
+		[u8(01), 02, 03, 03, 04, 01], // back face
+		[   05,  06, 07, 07, 08, 05], // front face
+		[   09,  10, 11, 11, 12, 09], // left face
+		[   13,  14, 15, 15, 16, 13], // right face
+		[   17,  18, 19, 19, 20, 17], // bottom face
+		[   21,  22, 23, 23, 24, 21]  // top face
+	]
+)
+// vfmt on
 
 // Block represents a block in the game.
 struct Block {

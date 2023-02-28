@@ -128,10 +128,9 @@ pub fn (a Vector2) / (b Vector2) Vector2 {
 
 // Vertex
 pub struct Vertex {
-	x	  f32
-	y     f32
-	z     f32
-	color u32
-	u     f32
-	v     f32
+	x f32
+	y f32
+	z f32
+	u f32
+	v f32
 }
