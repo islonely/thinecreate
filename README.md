@@ -9,8 +9,8 @@ Minecraft. Such as enchanting, potions and witches, the nether or hell among oth
 Install dependencies by running `v install` in the cloned repo (the directory containing the v.mod file).
 
 ### TODO
-In no particular order:
-- Fix note at chunk.v:3
+Not an exhaustive list and in no particular order:
+- TOP PRIORITY: Render chunks with VBO/VAO instead of glBegin & glEnd.
 - Infinite worlds
 - HUD
 - Inventory
