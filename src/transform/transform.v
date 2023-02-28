@@ -114,3 +114,13 @@ pub fn (a Vector2) < (b Vector2) bool {
 pub fn (a Vector2) + (b Vector2) Vector2 {
 	return Vector2{(a.x + b.x), (a.y + b.y)}
 }
+
+[inline]
+pub fn (a Vector2) * (b Vector2) Vector2 {
+	return Vector2{(a.x * b.x), (a.y * b.y)}
+}
+
+[inline]
+pub fn (a Vector2) / (b Vector2) Vector2 {
+	return Vector2{(a.x / b.x), (a.y / b.y)}
+}

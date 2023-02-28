@@ -26,7 +26,7 @@ mut:
 	selector_pos      Vector2
 	selector_target   Vector2
 	selector_velocity Vector2
-	selector_speed    f32 = 35 // lower value = faster speed
+	selector_speed    f32 = 1 // lower value = faster speed
 	selected          int
 	selected_color    gx.Color = gx.hex(0xff2c80ff)
 	items             []MenuItem
@@ -118,7 +118,7 @@ fn (mut menu Menu) draw(mut game Game) {
 		if i == menu.selected {
 			w, h := game.g.text_size(item.label)
 			menu.selector_target = Vector2{x, (y + h / 2 + 5)}
-			menu.selector_velocity = Vector2{(menu.selector_target.x - menu.selector_pos.x) / menu.selector_speed, (menu.selector_target.y - menu.selector_pos.y) / menu.selector_speed}
+			menu.selector_velocity = Vector2{(menu.selector_target.x - menu.selector_pos.x) / f32(game.delta_time), (menu.selector_target.y - menu.selector_pos.y) / f32(game.delta_time)} / Vector2{menu.selector_speed, menu.selector_speed}
 			if !item.disabled {
 				color = menu.selected_color
 				game.g.draw_rounded_rect_filled(menu.selector_pos.x, menu.selector_pos.y,

@@ -204,7 +204,7 @@ fn init(mut game Game) {
 				}
 			},
 			MenuItem{
-				label: 'Debug Overlay: true'
+				label: $if debug { 'Debug Overlay: true' } $else { 'Debug Overlay: false' }
 				on_selected: fn [mut game] () {
 					game.settings.menu.items[3].label = if game.settings.debug {
 						'Debug Overlay: false'
