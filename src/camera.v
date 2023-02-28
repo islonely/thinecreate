@@ -56,7 +56,7 @@ fn (mut cam Camera) on_mouse_move() {
 // perspective sets the sgl matrix perspective.
 [inline]
 fn (cam Camera) perspective() {
-	sgl.perspective(cam.fov, cam.aspect_ratio(), cam.near_plane, cam.far_plane)
+	sgl.perspective(sgl.rad(cam.fov), cam.aspect_ratio(), cam.near_plane, cam.far_plane)
 }
 
 // update updates where the Camerea is currently looking at.

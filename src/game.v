@@ -335,6 +335,7 @@ fn (mut game Game) draw() {
 		.paused {
 			game.draw_playing()
 			game.init_2d()
+			game.g.draw_rect_filled(0, 0, (game.width / dpi_scale(mut game)), (game.height / dpi_scale(mut game)), gx.hex(0x111111c0))
 			game.pausemenu.draw(mut game)
 		}
 		.playing {

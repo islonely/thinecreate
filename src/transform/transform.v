@@ -52,7 +52,8 @@ pub fn (vec Vector3) mod() f32 {
 	return f32(math.sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z))
 }
 
-// normalize
+// normalize sets the values of Vector3 to between 0 and 1 in order
+// to get a direction.
 pub fn (vec Vector3) normalize() Vector3 {
 	m := vec.mod()
 	if m == 0 {
@@ -76,7 +77,7 @@ pub fn (a Vector3) cross(b Vector3) Vector3 {
 	}
 }
 
-// vec2
+// vec2 converts a Vector3 to Vector2 by omitting the Z value.
 [inline]
 pub fn (vec Vector3) vec2() Vector2 {
 	return Vector2{
@@ -92,7 +93,7 @@ __global:
 	y f32
 }
 
-// vec3
+// vec3 converts a Vector2 to Vector3
 [inline]
 pub fn (vec Vector2) vec3() Vector3 {
 	return Vector3{
@@ -123,4 +124,14 @@ pub fn (a Vector2) * (b Vector2) Vector2 {
 [inline]
 pub fn (a Vector2) / (b Vector2) Vector2 {
 	return Vector2{(a.x / b.x), (a.y / b.y)}
+}
+
+// Vertex
+pub struct Vertex {
+	x	  f32
+	y     f32
+	z     f32
+	color u32
+	u     f32
+	v     f32
 }
