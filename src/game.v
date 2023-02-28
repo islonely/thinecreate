@@ -49,6 +49,7 @@ mut:
 	textures map[string][]gfx.Image
 
 	mainmenu        MainMenu
+	pausemenu		Menu
 	menu_background gg.Image
 	logo            gg.Image
 
@@ -169,7 +170,7 @@ fn init(mut game Game) {
 	$if debug {
 		game.settings.debug = true
 	}
-	game.settings.menu.Menu = Menu{
+	game.settings.menu = Menu{
 		step: false
 		pos: Vector2{100, 100}
 		text_size: 30
@@ -222,6 +223,29 @@ fn init(mut game Game) {
 			}
 		]
 	}
+
+	// pause menu
+	game.pausemenu = Menu{
+		step: false
+		center_horizontal: true
+		center_vertical: true
+		text_size: 64
+		items: [
+			MenuItem{
+				label: 'Resume'
+				on_selected: fn [mut game] () {
+					game.state = .playing
+				}
+			},
+			MenuItem{
+				label: 'Quit'
+				on_selected: fn [mut game] () {
+					game.state = .mainmenu
+				}
+			}
+		]
+	}
+
 
 	println('END INIT')
 }
@@ -278,7 +302,7 @@ fn (mut game Game) update() {
 		.inventory {}
 		.loading {}
 		.mainmenu { game.mainmenu.update(game.key_is_down, mut game) }
-		.paused {}
+		.paused { game.pausemenu.update(game.key_is_down, mut game) }
 		.playing { game.update_playing() }
 		.settings { game.settings.menu.update(game.key_is_down, mut game) }
 	}
@@ -288,9 +312,13 @@ fn (mut game Game) update() {
 fn (mut game Game) update_playing() {
 	game.player.on_key_down(game.key_is_down, f32(game.delta_time))
 
-	if game.key_is_down[.f3] {
+	if game.key_is_down[.escape] {
+		game.state = .paused
+	}
+
+	if game.key_is_down[.f12] {
 		game.export_screenshot()
-		game.key_is_down[.f3] = false
+		game.key_is_down[.f12] = false
 	}
 }
 
@@ -304,25 +332,34 @@ fn (mut game Game) draw() {
 			game.init_2d()
 			game.mainmenu.draw(mut game)
 		}
-		.paused {}
-		.playing {
-			game.init_3d()
-			game.draw_skybox()
-			for mut chunk in game.chunks {
-				chunk.draw(mut game)
-			}
-
+		.paused {
+			game.draw_playing()
 			game.init_2d()
-			game.draw_playing_ui()
-
-			if game.settings.debug {
-				game.draw_debug()
-			}
+			game.pausemenu.draw(mut game)
+		}
+		.playing {
+			game.draw_playing()
 		}
 		.settings {
 			game.init_2d()
 			game.settings.draw(mut game)
 		}
+	}
+}
+
+// draw_playing draws the game while in the playing or paused GameState.
+fn (mut game Game) draw_playing() {
+	game.init_3d()
+	game.draw_skybox()
+	for mut chunk in game.chunks {
+		chunk.draw(mut game)
+	}
+
+	game.init_2d()
+	game.draw_playing_ui()
+
+	if game.settings.debug {
+		game.draw_debug()
 	}
 }
 
@@ -349,6 +386,7 @@ fn (mut game Game) draw_debug() {
 	fps := 'FPS: ${game.fps()}'
 	pos := 'Position: X: ${int(game.player.pos.x)}, Y: ${int(game.player.pos.y)}, Z: ${int(game.player.pos.z)}'
 	facing := 'Facing: ${game.player.facing().str().trim_left('.')}'
+	game.g.set_text_cfg(size: size)
 	w, mut h := game.g.text_size(pos)
 	h *= 3
 	h += 3 * padding

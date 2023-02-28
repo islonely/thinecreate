@@ -1,15 +1,10 @@
 import gg
 import gx
 
-// SettingsMenu
-struct SettingsMenu {
-	Menu
-}
-
 // Settings is the Game settings
 struct Settings {
 mut:
-	menu SettingsMenu
+	menu Menu
 
 	debug bool
 

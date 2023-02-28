@@ -11,6 +11,8 @@ struct MainMenu {
 struct Menu {
 mut:
 	pos         Vector2
+	center_horizontal bool
+	center_vertical bool
 	text_size   int           = 44
 	text_shadow bool          = true
 	text_color  gx.Color      = gx.white
@@ -46,6 +48,42 @@ mut:
 enum StepDirection {
 	left
 	right
+}
+
+// width returns the width of the Menu
+fn (menu Menu) width(mut game Game) int {
+	mut longest_text := ''
+	for item in menu.items {
+		if item.label.len > longest_text.len {
+			longest_text = item.label
+		}
+	}
+	return game.g.text_width(longest_text)
+}
+
+// height returns the height of the Menu
+[inline]
+fn (menu Menu) height(mut game Game) int {
+	return (game.g.text_height('PLACEHOLDER') * menu.items.len) + (menu.padding * menu.items.len)
+}
+
+// center_horizontal centers the Menu on the X axis.
+[inline]
+fn (mut menu Menu) center_horizontal(mut game Game) {
+	menu.pos.x = game.half_width - (menu.width(mut game) / 2)
+}
+
+// center_vertical centers the Menu on the Y axis.
+[inline]
+fn (mut menu Menu) center_vertical(mut game Game) {
+	menu.pos.y = game.half_height - (menu.height(mut game) / 2)
+}
+
+// center centers the Menu on both the X and Y axis.
+[inline]
+fn (mut menu Menu) center(mut game Game) {
+	menu.center_horizontal(mut game)
+	menu.center_vertical(mut game)
 }
 
 // update handles key presses on the Menu among other things.
@@ -96,6 +134,14 @@ fn (mut menu MainMenu) draw(mut game Game) {
 
 // draw draws the Menu to the screen.
 fn (mut menu Menu) draw(mut game Game) {
+	game.g.set_text_cfg(size: menu.text_size)
+	if menu.center_horizontal {
+		menu.center_horizontal(mut game)
+	}
+	if menu.center_vertical {
+		menu.center_vertical(mut game)
+	}
+
 	for i := 0; i < menu.items.len; i++ {
 		item := menu.items[i]
 		step := (i * menu.step_size)
