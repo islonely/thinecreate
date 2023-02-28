@@ -8,45 +8,45 @@ const (
 // vfmt off
 const (
 	block_vertices = [
-		//          X            Y            Z        U      V
+		//          X            Y            Z        U      V          C
 		// back face
-		Vertex{-block_size,  block_size, -block_size, 1.0,  third}
-		Vertex{ block_size,  block_size, -block_size, 0.75, third}
-		Vertex{ block_size, -block_size, -block_size, 0.75, third2}
-		Vertex{-block_size, -block_size, -block_size, 1.0,  third2}
+		Vertex{-block_size,  block_size, -block_size, 1.0,  third,  0xFFFFFF_FF},
+		Vertex{ block_size,  block_size, -block_size, 0.75, third,  0xFFFFFF_FF},
+		Vertex{ block_size, -block_size, -block_size, 0.75, third2, 0xFFFFFF_FF},
+		Vertex{-block_size, -block_size, -block_size, 1.0,  third2, 0xFFFFFF_FF},
 		// front face
-		Vertex{-block_size, -block_size,  block_size, 0.25, third2}
-		Vertex{ block_size, -block_size,  block_size, 0.5,  third2}
-		Vertex{ block_size,  block_size,  block_size, 0.5,  third}
-		Vertex{-block_size,  block_size,  block_size, 0.25, third}
+		Vertex{-block_size, -block_size,  block_size, 0.25, third2, 0xFFFFFF_FF},
+		Vertex{ block_size, -block_size,  block_size, 0.5,  third2, 0xFFFFFF_FF},
+		Vertex{ block_size,  block_size,  block_size, 0.5,  third,  0xFFFFFF_FF},
+		Vertex{-block_size,  block_size,  block_size, 0.25, third,  0xFFFFFF_FF},
 		// left face
-		Vertex{-block_size,  block_size,  block_size, 0.25, third}
-		Vertex{-block_size,  block_size, -block_size, 0.0,  third}
-		Vertex{-block_size, -block_size, -block_size, 0.0,  third2}
-		Vertex{-block_size, -block_size,  block_size, 0.25, third2}
+		Vertex{-block_size,  block_size,  block_size, 0.25, third,  0xFFFFFF_FF},
+		Vertex{-block_size,  block_size, -block_size, 0.0,  third,  0xFFFFFF_FF},
+		Vertex{-block_size, -block_size, -block_size, 0.0,  third2, 0xFFFFFF_FF},
+		Vertex{-block_size, -block_size,  block_size, 0.25, third2, 0xFFFFFF_FF},
 		// right face
-		Vertex{ block_size, -block_size,  block_size, 0.5,  third2}
-		Vertex{ block_size, -block_size, -block_size, 0.75, third2}
-		Vertex{ block_size,  block_size, -block_size, 0.75, third}
-		Vertex{ block_size,  block_size,  block_size, 0.5,  third}
+		Vertex{ block_size, -block_size,  block_size, 0.5,  third2, 0xFFFFFF_FF},
+		Vertex{ block_size, -block_size, -block_size, 0.75, third2, 0xFFFFFF_FF},
+		Vertex{ block_size,  block_size, -block_size, 0.75, third,  0xFFFFFF_FF},
+		Vertex{ block_size,  block_size,  block_size, 0.5,  third,  0xFFFFFF_FF},
 		// bottom face
-		Vertex{ block_size, -block_size, -block_size, 0.5,  1.0}
-		Vertex{ block_size, -block_size,  block_size, 0.5,  third2}
-		Vertex{-block_size, -block_size,  block_size, 0.25, third2}
-		Vertex{-block_size, -block_size, -block_size, 0.25, 1.0}
+		Vertex{ block_size, -block_size, -block_size, 0.5,  1.0,    0xFFFFFF_FF},
+		Vertex{ block_size, -block_size,  block_size, 0.5,  third2, 0xFFFFFF_FF},
+		Vertex{-block_size, -block_size,  block_size, 0.25, third2, 0xFFFFFF_FF},
+		Vertex{-block_size, -block_size, -block_size, 0.25, 1.0,    0xFFFFFF_FF},
 		// top face
-		Vertex{-block_size,  block_size, -block_size, 0.25,  0.0}
-		Vertex{-block_size,  block_size,  block_size, 0.25,  third}
-		Vertex{ block_size,  block_size,  block_size, 0.5,   third}
-		Vertex{ block_size,  block_size, -block_size, 0.5,   0.0}
+		Vertex{-block_size,  block_size, -block_size, 0.25,  0.0,   0xFFFFFF_FF},
+		Vertex{-block_size,  block_size,  block_size, 0.25,  third, 0xFFFFFF_FF},
+		Vertex{ block_size,  block_size,  block_size, 0.5,   third, 0xFFFFFF_FF},
+		Vertex{ block_size,  block_size, -block_size, 0.5,   0.0,   0xFFFFFF_FF}
 	]
 	block_indices = [
-		[u8(01), 02, 03, 03, 04, 01], // back face
-		[   05,  06, 07, 07, 08, 05], // front face
-		[   09,  10, 11, 11, 12, 09], // left face
-		[   13,  14, 15, 15, 16, 13], // right face
-		[   17,  18, 19, 19, 20, 17], // bottom face
-		[   21,  22, 23, 23, 24, 21]  // top face
+		u8(01), 02, 03, 03, 04, 01, // back face
+		   05,  06, 07, 07, 08, 05, // front face
+		   09,  10, 11, 11, 12, 09, // left face
+		   13,  14, 15, 15, 16, 13, // right face
+		   17,  18, 19, 19, 20, 17, // bottom face
+		   21,  22, 23, 23, 24, 21  // top face
 	]
 )
 // vfmt on

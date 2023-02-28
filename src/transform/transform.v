@@ -133,4 +133,5 @@ pub struct Vertex {
 	z f32
 	u f32
 	v f32
+	c u32 = 0xFFFFFF_FF
 }
