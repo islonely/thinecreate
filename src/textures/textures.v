@@ -48,7 +48,7 @@ pub fn init() map[string][]gfx.Image {
 }
 
 // bytes_to_gfximage converts an array of bytes to a gfx.Image.
-fn bytes_to_gfximage(bytes []u8, name string) gfx.Image {
+pub fn bytes_to_gfximage(bytes []u8, name string) gfx.Image {
 	stb_img := stbi.load_from_memory(bytes.data, bytes.len) or {
 		println('Failed to load textures: ${name}')
 		exit(0)

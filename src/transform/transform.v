@@ -131,7 +131,7 @@ pub struct Vertex {
 	x f32
 	y f32
 	z f32
+	color u32 = 0xFFFFFF_FF
 	u f32
 	v f32
-	c u32 = 0xFFFFFF_FF
 }
