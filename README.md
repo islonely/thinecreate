@@ -1,3 +1,7 @@
+## Hiatus
+I'm stupid and can't understand opengl and glsl and shaders and graphics and stuff. So until some stranger on the internet is available to help me with vertex buffers and index buffers and shaders, then I'm going to have to postpone this project :'(
+Please feel free to make pull requests if you know what you're doing.
+
 ## ThineDesign
 An attempt to put my skills to the test in the creation of my first 3D game. This is
 mostly just meant to be an outlet to extend my knowledge into another area of programming.
