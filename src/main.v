@@ -21,4 +21,8 @@ fn frame(mut game Game) {
 	game.g.begin()
 	game.draw()
 	game.g.end()
+
+	for defered in game.@defer {
+		defered(mut game)
+	}
 }

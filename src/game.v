@@ -1,5 +1,6 @@
 import arrays
 import gg
+import gg.m4
 import gx
 import os
 import time
@@ -31,6 +32,7 @@ mut:
 
 	glsl_pipeline gfx.Pipeline
 	bindings 	  gfx.Bindings
+	@defer        []fn(mut Game)
 
 	width       int   = width
 	half_width  int   = half_width
@@ -42,7 +44,7 @@ mut:
 	last_time    i64 = time.now().unix_time_milli()
 	current_time i64
 
-	state    GameState = .mainmenu
+	state    GameState = $if debug { .playing } $else { .mainmenu }
 	settings Settings
 
 	key_is_down KeyDown
@@ -402,6 +404,48 @@ fn (mut game Game) draw() {
 		}
 		.playing {
 			game.draw_playing()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			game.@defer << fn(mut game Game) {
+				win_size := real_window_size(mut game)
+				mut color_action := gfx.ColorAttachmentAction{
+					action: unsafe { gfx.Action(C.SG_ACTION_DONTCARE) }
+					value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+				}
+				mut pass_action := gfx.PassAction{}
+				pass_action.colors[0] = color_action
+				gfx.begin_default_pass(&pass_action, win_size.width, win_size.height)
+				{
+					rot := [f32(game.g.mouse_pos_y), f32(game.g.mouse_pos_x)]
+					dw := win_size.width / 2
+					dh := win_size.height /2
+
+					tr_matrix := m4.calc_tr_matrices(f32(dw), f32(dh), rot[0], rot[1], 3.0)
+					gfx.apply_viewport(dw, 0, dw, dh, true)
+
+					gfx.apply_pipeline(game.glsl_pipeline)
+					gfx.apply_bindings(game.bindings)
+
+					vs_uniforms_range := gfx.Range{
+						ptr: &tr_matrix
+						size: usize(4 * 16)
+					}
+					gfx.apply_uniforms(.vs, C.SLOT_vs_params, &vs_uniforms_range)
+
+					// this code controls the light source
+					// time_ticks := f32(time.ticks() - i64(game.g.frame)) / 1000
+					// mut text_res := [f32(16), 16, time_ticks, 0]!
+					// fs_uniforms_range := gfx.Range{
+					// 	ptr: unsafe { &text_res }
+					// 	size: usize(4 * 4)
+					// }
+					// gfx.apply_uniforms(.fs, C.SLOT_fs_params, &fs_uniforms_range)
+					// 3 vertices make a triangle, 2 triangles make a square, 6 squares make a cube
+					gfx.draw(0, (3 * 2) * 6, 1)
+				}
+				gfx.end_pass()
+				gfx.commit()
+			}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		}
 		.settings {
 			game.init_2d()
