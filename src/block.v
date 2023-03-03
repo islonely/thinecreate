@@ -41,12 +41,12 @@ const (
 		Vertex{ block_size,  block_size, -block_size, 0xFFFFFF_FF, 0.5,   0.0}
 	]
 	block_indices = [
-		u16(01), 02, 03, 03, 04, 01, // back face
-		    05,  06, 07, 07, 08, 05, // front face
-		    09,  10, 11, 11, 12, 09, // left face
-		    13,  14, 15, 15, 16, 13, // right face
-		    17,  18, 19, 19, 20, 17, // bottom face
-		    21,  22, 23, 23, 24, 21  // top face
+		u16(00), 01, 02, 00, 02, 03, // back face
+		    06,  05, 04, 07, 06, 04, // front face
+		    08,  09, 10, 08, 10, 11, // left face
+		    14,  13, 12, 15, 14, 12, // right face
+		    16,  17, 18, 16, 18, 19, // bottom face
+		    22,  21, 20, 23, 22, 20  // top face
 	]
 )
 // vfmt on
