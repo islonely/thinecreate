@@ -44,7 +44,7 @@ mut:
 	last_time    i64 = time.now().unix_time_milli()
 	current_time i64
 
-	state    GameState = $if debug { .playing } $else { .mainmenu }
+	state    GameState = $if debug { GameState.playing } $else { GameState.mainmenu }
 	settings Settings
 
 	key_is_down KeyDown
