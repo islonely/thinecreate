@@ -6,8 +6,8 @@ import time
 import sokol.sapp
 import sokol.sgl
 import sokol.gfx
-import src.textures
-import src.transform { Vector2, Vector3 }
+import textures
+import transform { Vector2, Vector3 }
 
 const (
 	width       = 1920
@@ -49,7 +49,7 @@ mut:
 	textures map[string][]gfx.Image
 
 	mainmenu        MainMenu
-	pausemenu		Menu
+	pausemenu       Menu
 	menu_background gg.Image
 	logo            gg.Image
 
@@ -132,8 +132,14 @@ fn init(mut game Game) {
 	cam.on_mouse_move()
 
 	// main menu
-	game.menu_background = game.g.create_image_from_byte_array(textures.mainmenu_background_bytes)
-	game.logo = game.g.create_image_from_byte_array(textures.logo_bytes)
+	game.menu_background = game.g.create_image_from_byte_array(textures.mainmenu_background_bytes) or {
+		println('Failed to create image from byte array. Exiting...')
+		exit(1)
+	}
+	game.logo = game.g.create_image_from_byte_array(textures.logo_bytes) or {
+		println('Failed to create image from byte array. Exiting...')
+		exit(1)
+	}
 	game.mainmenu = MainMenu{
 		pos: Vector2{
 			x: 190
@@ -165,7 +171,7 @@ fn init(mut game Game) {
 			},
 		]
 	}
-	
+
 	// settings menu
 	$if debug {
 		game.settings.debug = true
@@ -220,7 +226,7 @@ fn init(mut game Game) {
 				on_selected: fn [mut game] () {
 					game.state = .mainmenu
 				}
-			}
+			},
 		]
 	}
 
@@ -242,10 +248,9 @@ fn init(mut game Game) {
 				on_selected: fn [mut game] () {
 					game.state = .mainmenu
 				}
-			}
+			},
 		]
 	}
-
 
 	println('END INIT')
 }
@@ -335,7 +340,8 @@ fn (mut game Game) draw() {
 		.paused {
 			game.draw_playing()
 			game.init_2d()
-			game.g.draw_rect_filled(0, 0, (game.width / dpi_scale(mut game)), (game.height / dpi_scale(mut game)), gx.hex(0x111111c0))
+			game.g.draw_rect_filled(0, 0, (game.width / dpi_scale(mut game)), (game.height / dpi_scale(mut game)),
+				gx.hex(0x111111c0))
 			game.pausemenu.draw(mut game)
 		}
 		.playing {
@@ -392,7 +398,8 @@ fn (mut game Game) draw_debug() {
 	h *= 3
 	h += 3 * padding
 
-	game.g.draw_rounded_rect_filled(15-padding, 15-padding, w+padding*2, h, 5.0, bg)
+	game.g.draw_rounded_rect_filled(15 - padding, 15 - padding, w + padding * 2, h, 5.0,
+		bg)
 	game.g.draw_text(15, (row * size + padding), fps,
 		size: size
 		color: gx.white
