@@ -9,28 +9,26 @@ import sokol.gfx
 import textures
 import transform { Vector2, Vector3 }
 
-const (
-	width       = 1920
-	half_width  = width / 2
-	height      = 1080
-	half_height = height / 2
-)
+const width = 1920
+const half_width = width / 2
+const height = 1080
+const half_height = height / 2
 
 // Game is a game.
-[heap]
+@[heap]
 struct Game {
 mut:
-	g        &gg.Context = unsafe { nil }
-	pipeline sgl.Pipeline
-
-	width       int   = width
-	half_width  int   = half_width
-	height      int   = height
-	half_height int   = half_height
-	fps_queue   []f32 = []f32{len: 100}
+	g               &gg.Context = unsafe { nil }
+	pipeline        sgl.Pipeline
+	default_sampler gfx.Sampler
+	width           int   = width
+	half_width      int   = half_width
+	height          int   = height
+	half_height     int   = half_height
+	fps_queue       []f32 = []f32{len: 100}
 
 	delta_time   i64
-	last_time    i64 = time.now().unix_time_milli()
+	last_time    i64 = time.now().unix_milli()
 	current_time i64
 
 	state    GameState = .mainmenu
@@ -38,6 +36,8 @@ mut:
 
 	key_is_down KeyDown
 
+	mouse_x f32
+	mouse_y f32
 	offsetx f32
 	offsety f32
 	lastx   f32
@@ -75,21 +75,21 @@ fn new_game() &Game {
 		player: &Player{}
 	}
 	game.g = gg.new_context(
-		user_data: game
-		init_fn: init
-		frame_fn: frame
-		move_fn: handle_mouse_move
-		keydown_fn: handle_key_down
-		keyup_fn: handle_key_up
-		resized_fn: handle_resize
-		leave_fn: handle_leave
-		window_title: 'ThineDesign'
-		width: game.width
-		height: game.height
+		user_data:         game
+		init_fn:           init
+		frame_fn:          frame
+		move_fn:           handle_mouse_move
+		keydown_fn:        handle_key_down
+		keyup_fn:          handle_key_up
+		resized_fn:        handle_resize
+		leave_fn:          handle_leave
+		window_title:      'ThineDesign'
+		width:             game.width
+		height:            game.height
 		font_bytes_normal: $embed_file('fonts/maple_mono/fonts/MapleMono-Regular.ttf').to_bytes()
-		font_bytes_bold: $embed_file('fonts/maple_mono/fonts/MapleMono-Bold.ttf').to_bytes()
+		font_bytes_bold:   $embed_file('fonts/maple_mono/fonts/MapleMono-Bold.ttf').to_bytes()
 		font_bytes_italic: $embed_file('fonts/maple_mono/fonts/MapleMono-Italic.ttf').to_bytes()
-		font_bytes_mono: $embed_file('fonts/maple_mono/fonts/MapleMono-Regular.ttf').to_bytes()
+		font_bytes_mono:   $embed_file('fonts/maple_mono/fonts/MapleMono-Regular.ttf').to_bytes()
 	)
 	game.player.cameras << new_camera(game.player, game.width, game.height, game.settings.fov)
 	return game
@@ -107,23 +107,25 @@ fn init(mut game Game) {
 			vmemset(&pipe_desc, 0, int(sizeof(pipe_desc)))
 		}
 
-		pipe_desc.colors[0] = gfx.ColorState{
-			blend: gfx.BlendState{
-				enabled: true
-				src_factor_rgb: .src_alpha
-				dst_factor_rgb: .one_minus_src_alpha
-			}
-		}
+		pipe_desc.colors[0].blend.enabled = true
+		pipe_desc.colors[0].blend.src_factor_rgb = .src_alpha
+		pipe_desc.colors[0].blend.dst_factor_rgb = .one_minus_src_alpha
 
 		pipe_desc.depth = gfx.DepthState{
 			write_enabled: true
-			compare: .less_equal
+			compare:       .less_equal
 		}
 
 		// pipe_desc.cull_mode = .back
 		game.pipeline = sgl.make_pipeline(&pipe_desc)
 	}
 	game.textures = textures.init()
+	game.default_sampler = gfx.make_sampler(
+		min_filter: .nearest
+		mag_filter: .nearest
+		wrap_u:     .clamp_to_edge
+		wrap_v:     .clamp_to_edge
+	)
 	game.chunks << new_chunk(1, Vector3{})
 
 	// Camera does not update until mouse moves, so we want to do it
@@ -141,30 +143,30 @@ fn init(mut game Game) {
 		exit(1)
 	}
 	game.mainmenu = MainMenu{
-		pos: Vector2{
+		pos:   Vector2{
 			x: 190
 			y: int(game.height / dpi_scale(mut game) - 230)
 		}
 		items: [
 			MenuItem{
-				label: 'Singleplayer'
+				label:       'Singleplayer'
 				on_selected: fn [mut game] () {
 					game.state = .playing
 				}
 			},
 			MenuItem{
-				label: 'Multiplayer'
+				label:     'Multiplayer'
 				clickable: false
-				disabled: true
+				disabled:  true
 			},
 			MenuItem{
-				label: 'Settings'
+				label:       'Settings'
 				on_selected: fn [mut game] () {
 					game.state = .settings
 				}
 			},
 			MenuItem{
-				label: 'Quit'
+				label:       'Quit'
 				on_selected: fn [mut game] () {
 					game.g.quit()
 				}
@@ -177,19 +179,19 @@ fn init(mut game Game) {
 		game.settings.debug = true
 	}
 	game.settings.menu = Menu{
-		step: false
-		pos: Vector2{100, 100}
+		step:      false
+		pos:       Vector2{100, 100}
 		text_size: 30
-		italic: false
-		items: [
+		italic:    false
+		items:     [
 			MenuItem{
 				clickable: false
-				disabled: true
-				label: 'Resolution: ${game.width}x${game.height}'
+				disabled:  true
+				label:     'Resolution: ${game.width}x${game.height}'
 				// TODO: Add ability to change resolution.
 			},
 			MenuItem{
-				label: 'Fullscreen: disabled'
+				label:       'Fullscreen: disabled'
 				on_selected: fn [mut game] () {
 					game.settings.menu.items[1].label = if gg.is_fullscreen() {
 						'Fullscreen: disabled'
@@ -200,7 +202,7 @@ fn init(mut game Game) {
 				}
 			},
 			MenuItem{
-				label: 'Invert Y Axis: false'
+				label:       'Invert Y Axis: false'
 				on_selected: fn [mut game] () {
 					game.settings.menu.items[2].label = if game.settings.invert_y_axis == -1 {
 						'Invert Y Axis: true'
@@ -211,7 +213,7 @@ fn init(mut game Game) {
 				}
 			},
 			MenuItem{
-				label: $if debug { 'Debug Overlay: true' } $else { 'Debug Overlay: false' }
+				label:       $if debug { 'Debug Overlay: true' } $else { 'Debug Overlay: false' }
 				on_selected: fn [mut game] () {
 					game.settings.menu.items[3].label = if game.settings.debug {
 						'Debug Overlay: false'
@@ -222,7 +224,7 @@ fn init(mut game Game) {
 				}
 			},
 			MenuItem{
-				label: 'Back'
+				label:       'Back'
 				on_selected: fn [mut game] () {
 					game.state = .mainmenu
 				}
@@ -232,19 +234,19 @@ fn init(mut game Game) {
 
 	// pause menu
 	game.pausemenu = Menu{
-		step: false
+		step:              false
 		center_horizontal: true
-		center_vertical: true
-		text_size: 64
-		items: [
+		center_vertical:   true
+		text_size:         64
+		items:             [
 			MenuItem{
-				label: 'Resume'
+				label:       'Resume'
 				on_selected: fn [mut game] () {
 					game.state = .playing
 				}
 			},
 			MenuItem{
-				label: 'Quit'
+				label:       'Quit'
 				on_selected: fn [mut game] () {
 					game.state = .mainmenu
 				}
@@ -256,7 +258,7 @@ fn init(mut game Game) {
 }
 
 // fps returns the current frames per second.
-[inline]
+@[inline]
 fn (game Game) fps() int {
 	sum := arrays.sum(game.fps_queue) or {
 		println(err.msg())
@@ -401,36 +403,36 @@ fn (mut game Game) draw_debug() {
 	game.g.draw_rounded_rect_filled(15 - padding, 15 - padding, w + padding * 2, h, 5.0,
 		bg)
 	game.g.draw_text(15, (row * size + padding), fps,
-		size: size
+		size:  size
 		color: gx.white
 	)
 	row++
 	game.g.draw_text(15, (row * size + padding), pos,
-		size: size
+		size:  size
 		color: gx.white
 	)
 	row++
 	game.g.draw_text(15, (row * size + padding), facing,
-		size: size
+		size:  size
 		color: gx.white
 	)
 }
 
 // aspect_ratio returns the aspect ratio of the Game.
-[inline]
+@[inline]
 fn (mut game Game) aspect_ratio() f32 {
 	return f32(game.width) / f32(game.height)
 }
 
 // perspective
-[inline]
+@[inline]
 fn (mut game Game) perspective() {
 	sgl.perspective(sgl.rad(game.camera().fov), game.aspect_ratio(), game.camera().near_plane,
 		game.camera().far_plane)
 }
 
 // camera returns a reference to the current Camera being used.
-[inline]
+@[inline]
 fn (mut game Game) camera() &Camera {
 	return game.player.camera()
 }
@@ -441,7 +443,7 @@ fn (mut game Game) draw_skybox() {
 	sgl.load_pipeline(game.pipeline)
 
 	sgl.enable_texture()
-	sgl.texture(game.textures['misc'][0])
+	sgl.texture(game.textures['misc'][0], game.default_sampler)
 	sgl.push_matrix()
 
 	sgl.matrix_mode_projection()

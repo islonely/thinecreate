@@ -7,23 +7,23 @@ struct MainMenu {
 }
 
 // Menu
-[heap]
+@[heap]
 struct Menu {
 mut:
-	pos         Vector2
+	pos               Vector2
 	center_horizontal bool
-	center_vertical bool
-	text_size   int           = 44
-	text_shadow bool          = true
-	text_color  gx.Color      = gx.white
-	disabled_color gx.Color = gx.hex(0xbceaff9f)
-	padding     int           = 8
-	bold		bool
-	italic		bool		  = true
-	monospaced	bool
-	step        bool          = true
-	step_size   int           = 35
-	step_dir    StepDirection = .left
+	center_vertical   bool
+	text_size         int      = 44
+	text_shadow       bool     = true
+	text_color        gx.Color = gx.white
+	disabled_color    gx.Color = gx.hex(0xbceaff9f)
+	padding           int      = 8
+	bold              bool
+	italic            bool = true
+	monospaced        bool
+	step              bool          = true
+	step_size         int           = 35
+	step_dir          StepDirection = .left
 
 	selector_pos      Vector2
 	selector_target   Vector2
@@ -37,9 +37,9 @@ mut:
 // MenuItem represents an individual item in the MainMenu.
 struct MenuItem {
 mut:
-	on_selected fn () = fn(){}
+	on_selected fn ()  = fn () {}
 	label       string = '<label_not_set>'
-	disabled	bool
+	disabled    bool
 	clickable   bool = true
 }
 
@@ -62,25 +62,25 @@ fn (menu Menu) width(mut game Game) int {
 }
 
 // height returns the height of the Menu
-[inline]
+@[inline]
 fn (menu Menu) height(mut game Game) int {
 	return (game.g.text_height('PLACEHOLDER') * menu.items.len) + (menu.padding * menu.items.len)
 }
 
 // center_horizontal centers the Menu on the X axis.
-[inline]
+@[inline]
 fn (mut menu Menu) center_horizontal(mut game Game) {
 	menu.pos.x = game.half_width - (menu.width(mut game) / 2)
 }
 
 // center_vertical centers the Menu on the Y axis.
-[inline]
+@[inline]
 fn (mut menu Menu) center_vertical(mut game Game) {
 	menu.pos.y = game.half_height - (menu.height(mut game) / 2)
 }
 
 // center centers the Menu on both the X and Y axis.
-[inline]
+@[inline]
 fn (mut menu Menu) center(mut game Game) {
 	menu.center_horizontal(mut game)
 	menu.center_vertical(mut game)
@@ -170,23 +170,23 @@ fn (mut menu Menu) draw(mut game Game) {
 				game.g.draw_rounded_rect_filled(menu.selector_pos.x, menu.selector_pos.y,
 					w, 2.5, 500, color)
 			} else if item.disabled {
-				game.g.draw_rounded_rect_filled(menu.selector_pos.x, menu.selector_pos.y-f32(h)/1.5,
+				game.g.draw_rounded_rect_filled(menu.selector_pos.x, menu.selector_pos.y - f32(h) / 1.5,
 					w, 2.5, 500, color)
 			}
 		}
 
 		game.g.draw_text(int(x), int(y), item.label,
-			size: menu.text_size
+			size:           menu.text_size
 			vertical_align: .middle
-			align: if menu.step_dir == .right {
+			align:          if menu.step_dir == .right {
 				.right
 			} else {
 				.left
 			}
-			bold: menu.bold
-			italic: menu.italic
-			mono: menu.monospaced
-			color: color
+			bold:           menu.bold
+			italic:         menu.italic
+			mono:           menu.monospaced
+			color:          color
 		)
 	}
 }

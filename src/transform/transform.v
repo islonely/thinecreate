@@ -11,7 +11,7 @@ __global:
 }
 
 // + adds the two Vector3's together.
-[inline]
+@[inline]
 pub fn (a Vector3) + (b Vector3) Vector3 {
 	return Vector3{
 		x: a.x + b.x
@@ -21,7 +21,7 @@ pub fn (a Vector3) + (b Vector3) Vector3 {
 }
 
 // + adds the two Vector3's together.
-[inline]
+@[inline]
 pub fn (a Vector3) - (b Vector3) Vector3 {
 	return Vector3{
 		x: a.x - b.x
@@ -31,7 +31,7 @@ pub fn (a Vector3) - (b Vector3) Vector3 {
 }
 
 // * multiplies two Vector3's together.
-[inline]
+@[inline]
 pub fn (a Vector3) * (b Vector3) Vector3 {
 	return Vector3{
 		x: a.x * b.x
@@ -41,13 +41,13 @@ pub fn (a Vector3) * (b Vector3) Vector3 {
 }
 
 // multf32 multiplies X, Y, and Z by one value.
-[inline]
+@[inline]
 pub fn (a Vector3) multf32(val f32) Vector3 {
 	return a * Vector3{val, val, val}
 }
 
 // mod
-[inline]
+@[inline]
 pub fn (vec Vector3) mod() f32 {
 	return f32(math.sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z))
 }
@@ -68,7 +68,7 @@ pub fn (vec Vector3) normalize() Vector3 {
 }
 
 // cross product
-[inline]
+@[inline]
 pub fn (a Vector3) cross(b Vector3) Vector3 {
 	return Vector3{
 		x: (a.y * b.z) - (a.z * b.y)
@@ -78,7 +78,7 @@ pub fn (a Vector3) cross(b Vector3) Vector3 {
 }
 
 // vec2 converts a Vector3 to Vector2 by omitting the Z value.
-[inline]
+@[inline]
 pub fn (vec Vector3) vec2() Vector2 {
 	return Vector2{
 		x: vec.x
@@ -94,7 +94,7 @@ __global:
 }
 
 // vec3 converts a Vector2 to Vector3
-[inline]
+@[inline]
 pub fn (vec Vector2) vec3() Vector3 {
 	return Vector3{
 		x: vec.x
@@ -102,33 +102,33 @@ pub fn (vec Vector2) vec3() Vector3 {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (a Vector2) < (b Vector2) bool {
-	return if (a.x < b.x) || (a.y < b.y) {
+	return if a.x < b.x || a.y < b.y {
 		true
 	} else {
 		false
 	}
 }
 
-[inline]
+@[inline]
 pub fn (a Vector2) + (b Vector2) Vector2 {
 	return Vector2{(a.x + b.x), (a.y + b.y)}
 }
 
-[inline]
+@[inline]
 pub fn (a Vector2) * (b Vector2) Vector2 {
 	return Vector2{(a.x * b.x), (a.y * b.y)}
 }
 
-[inline]
+@[inline]
 pub fn (a Vector2) / (b Vector2) Vector2 {
 	return Vector2{(a.x / b.x), (a.y / b.y)}
 }
 
 // Vertex
 pub struct Vertex {
-	x	  f32
+	x     f32
 	y     f32
 	z     f32
 	color u32

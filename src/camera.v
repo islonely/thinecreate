@@ -3,14 +3,14 @@ import sokol.sgl
 import src.transform { Vector3 }
 
 // Camera the lens you look through to see the 3D space.
-[heap]
+@[heap]
 struct Camera {
 pub mut:
 	world_up Vector3 = Vector3{
 		y: 1
 	}
-	pos   Vector3
-	front Vector3
+	pos      Vector3
+	front    Vector3
 
 	yaw   f32 = -90
 	pitch f32
@@ -25,19 +25,19 @@ pub mut:
 }
 
 // new_camera instantiates a Camera and returns it.
-[inline]
+@[inline]
 fn new_camera(parent &Player, width int, height int, fov f32) &Camera {
 	return &Camera{
 		parent: parent
-		width: width
+		width:  width
 		height: height
-		fov: fov
-		pos: parent.pos
+		fov:    fov
+		pos:    parent.pos
 	}
 }
 
 // aspect_ratio calculates the aspect ratio of the Camera and returns it.
-[inline]
+@[inline]
 fn (cam Camera) aspect_ratio() f32 {
 	return f32(width) / f32(height)
 }
@@ -54,7 +54,7 @@ fn (mut cam Camera) on_mouse_move() {
 }
 
 // perspective sets the sgl matrix perspective.
-[inline]
+@[inline]
 fn (cam Camera) perspective() {
 	sgl.perspective(sgl.rad(cam.fov), cam.aspect_ratio(), cam.near_plane, cam.far_plane)
 }

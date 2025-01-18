@@ -21,6 +21,7 @@ mut:
 fn (mut settings Settings) draw(mut game Game) {
 	game.g.draw_image(0, 0, (game.width / dpi_scale(mut game)), (game.height / dpi_scale(mut game)),
 		game.menu_background)
-	game.g.draw_rect_filled(0, 0, (game.width / dpi_scale(mut game)), (game.height / dpi_scale(mut game)), gx.hex(0x111111c0))
+	game.g.draw_rect_filled(0, 0, (game.width / dpi_scale(mut game)), (game.height / dpi_scale(mut game)),
+		gx.hex(0x111111c0))
 	settings.menu.draw(mut game)
 }

@@ -4,17 +4,17 @@ import src.transform { Vector3 }
 // Block represents a block in the game.
 struct Block {
 pub:
-	typ        BlockType = .test
-	name       string
+	typ  BlockType = .test
+	name string
 pub mut:
-	pos Vector3
+	pos        Vector3
 	invisible  bool
 	collision  bool = true
 	suffocates bool = true
 	is_active  bool = true
 }
 
-[params]
+@[params]
 struct BlockProperties {
 	invisible  bool
 	collision  bool = true
@@ -22,26 +22,26 @@ struct BlockProperties {
 }
 
 // new_block instantiates a Block.
-[inline]
+@[inline]
 fn new_block(typ BlockType, name string, pos Vector3, props BlockProperties) &Block {
 	return &Block{
-		typ: typ
-		name: name
-		pos: pos
-		invisible: props.invisible
-		collision: props.collision
+		typ:        typ
+		name:       name
+		pos:        pos
+		invisible:  props.invisible
+		collision:  props.collision
 		suffocates: props.suffocates
 	}
 }
 
 // new_air_block instantiates an air Block.
-[inline]
+@[inline]
 fn new_air_block(pos Vector3) &Block {
 	return new_block(.air, 'block_air', pos, invisible: true, collision: false, suffocates: false)
 }
 
 // draw renders the block to the screen.
-[direct_array_access]
+@[direct_array_access]
 fn (mut block Block) draw(mut game Game) {
 	if block.invisible {
 		return
@@ -51,7 +51,7 @@ fn (mut block Block) draw(mut game Game) {
 	sgl.load_pipeline(game.pipeline)
 
 	sgl.enable_texture()
-	sgl.texture(game.textures['blocks'][int(block.typ)])
+	sgl.texture(game.textures['blocks'][int(block.typ)], game.default_sampler)
 	sgl.push_matrix()
 
 	sgl.matrix_mode_projection()

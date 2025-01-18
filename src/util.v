@@ -92,7 +92,7 @@ fn sgl_draw_cube_quads(size f32) {
 }
 
 // dpi_scale returns the appropriate scale for Android.
-[inline]
+@[inline]
 fn dpi_scale(mut game Game) f32 {
 	return $if android {
 		game.g.scale
@@ -102,7 +102,7 @@ fn dpi_scale(mut game Game) f32 {
 }
 
 // window_size returns the appropriate size for Android.
-[inline]
+@[inline]
 fn window_size(mut game Game) gg.Size {
 	return $if android {
 		game.g.window_size()
@@ -112,7 +112,7 @@ fn window_size(mut game Game) gg.Size {
 }
 
 // real_window_size returns the real appropriate size for Android.
-[inline]
+@[inline]
 fn real_window_size(mut game Game) gg.Size {
 	return $if android {
 		game.g.window_size()

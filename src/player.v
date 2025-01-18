@@ -1,12 +1,12 @@
 import src.transform { Vector3 }
 
 // Player represents the player.
-[heap]
+@[heap]
 struct Player {
 mut:
-	cameras  []&Camera = []&Camera{cap: 3}
-	curr_cam int
-	pos      Vector3 = Vector3{
+	cameras    []&Camera = []&Camera{cap: 3}
+	curr_cam   int
+	pos        Vector3 = Vector3{
 		y: 60
 		z: -2
 	}
@@ -26,7 +26,7 @@ fn (mut player Player) toggle_camera() {
 }
 
 // camera returns a reference to the current Camera being used.
-[direct_array_access]
+@[direct_array_access]
 fn (mut player Player) camera() &Camera {
 	return player.cameras[player.curr_cam]
 }

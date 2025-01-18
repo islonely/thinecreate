@@ -21,11 +21,11 @@ mut:
 }
 
 // new_chunk creates a Chunk with the specified size.
-[direct_array_access]
+@[direct_array_access]
 fn new_chunk(size int, p Vector3) &Chunk {
 	mut chunk := &Chunk{
 		size: size
-		pos: p
+		pos:  p
 	}
 
 	mut area := [][]&Block{}
@@ -57,7 +57,7 @@ fn new_chunk(size int, p Vector3) &Chunk {
 }
 
 // draw draws each Block in the chunk to the screen
-[direct_array_access]
+@[direct_array_access]
 fn (mut chunk Chunk) draw(mut game Game) {
 	for x in 0 .. chunk.size {
 		for y in 0 .. chunk.size {

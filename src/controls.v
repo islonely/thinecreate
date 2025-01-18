@@ -1,18 +1,15 @@
 import gg
-import mouse
 import sokol.sapp
 
 // handle_mouse_move handles all mouse movements in game.
 fn handle_mouse_move(window_x f32, window_y f32, mut game Game) {
-	global_x, global_y := mouse.get_pos()
-
 	if game.state == .playing {
 		sapp.show_mouse(false)
 
-		game.offsetx = (global_x - game.lastx) * f32(game.delta_time) * game.settings.mouse_sensitivity / 10
+		game.offsetx = (window_x - game.lastx) * f32(game.delta_time) * game.settings.mouse_sensitivity / 10
 		// Y coords go from bottom to top, so we must reverse
-		game.offsety = (game.lasty - global_y) * f32(game.delta_time) * game.settings.mouse_sensitivity / 10 * -game.settings.invert_y_axis
-		game.lastx, game.lasty = global_x, global_y
+		game.offsety = (game.lasty - window_y) * f32(game.delta_time) * game.settings.mouse_sensitivity / 10 * -game.settings.invert_y_axis
+		game.lastx, game.lasty = window_x, window_y
 
 		mut cam := game.player.camera()
 		new_yaw := cam.yaw + game.offsetx
@@ -35,7 +32,6 @@ fn handle_mouse_move(window_x f32, window_y f32, mut game Game) {
 		cam.on_mouse_move()
 
 		{ // wraps mouse to other side of window if it passes a certain threshold.
-			
 		}
 	} else {
 		sapp.show_mouse(true)
@@ -61,15 +57,14 @@ fn handle_resize(evt &gg.Event, mut game Game) {
 	game.mainmenu.pos.y = int(game.height / dpi_scale(mut game) - 230)
 }
 
-
 // handle_leave controls what happens when the mouse pointer leaves
 // the area of the window.
 fn handle_leave(evt &gg.Event, mut game Game) {
 	// don't let the mouse leave the window if the game is being played.
 	if game.state == .playing {
-		screen_size := mouse.screen_size()
-		center_x, center_y := screen_size.width/2, screen_size.height/2
+		screen_size := gg.screen_size()
+		center_x, center_y := screen_size.width / 2, screen_size.height / 2
 		game.lastx, game.lasty = center_x, center_y
-		mouse.set_pos(center_x, center_y)
+		// Mouse.set_pos(center_x, center_y)
 	}
 }

@@ -8,12 +8,12 @@ fn main() {
 }
 
 // Disables vsync, but only works on linux
-[if linux]
+@[if linux]
 fn C._sapp_glx_swapinterval(int)
 
 // frame gets called everytime a new frame is drawn to the screen.
 fn frame(mut game Game) {
-	game.current_time = time.now().unix_time_milli()
+	game.current_time = time.now().unix_milli()
 	game.delta_time = game.current_time - game.last_time
 	game.last_time = game.current_time
 
